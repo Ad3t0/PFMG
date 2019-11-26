@@ -1,4 +1,4 @@
-$ver = "v1.0.8"
+$ver = "v1.0.9"
 $p = Get-Process -Name explorer
 $procId = $p.Id[0]
 $currentUser = (Get-WmiObject -Class Win32_Process -Filter "ProcessId=$($procId)").GetOwner().User
@@ -31,7 +31,7 @@ function Invoke-ScriptMultithreaded {
 		[Object[]]$Array
 	)
 	begin {
-		if ($Arguments -eq $NULL) { $Arguments = @() }
+		if ($NULL -eq $Arguments) { $Arguments = @() }
 		$a = $Arguments
 	}
 	process {
@@ -311,12 +311,13 @@ $GROUPBOX_Excluded.controls.AddRange(@($TEXTBOX_Excluded))
 #
 $FORM_PFMGMain.Add_Shown({
 		$FORM_PFMGMain.Activate()
-		#Hide-Console
+		Hide-Console
 	})
 $LISTBOX_MigrateInfo.Items.Add("Loading...")
 $LABEL_ProfileFound.ForeColor = 'Green'
 $BUTTON_Migrate.Enabled = $False
 $BUTTON_Migrate.text = 'Export'
+$LISTBOX_MigrateInfo.SelectionMode = 'None'
 Invoke-ScriptMultithreaded -Script "C:\ProgramData\PFMG-Data\PFMG-exportSize.ps1" -Array 1
 $timer = New-Object System.Windows.Forms.Timer
 $timer.Interval = 2000
@@ -533,12 +534,12 @@ $BUTTON_Migrate.Add_Click({
 					New-Item -Path "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -ItemType "directory" -Force -ErrorAction SilentlyContinue
 					Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\GoogleChrome" -Destination "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -Force -ErrorAction SilentlyContinue
 					Start-Process "Firefox" -ArgumentList "-headless"
-					Sleep 1
+					Start-Sleep 1
 					Stop-Process -Name Firefox -Force -ErrorAction SilentlyContinue
-					Sleep 1
+					Start-Sleep 1
 					$firefoxProfile = Get-ChildItem -Path "$($currentUserProfile)\AppData\Roaming\Mozilla\Firefox\Profiles\" | Where-Object { $_.PSIsContainer } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 					Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\Firefox\places.sqlite" -Destination "$($currentUserProfile)\AppData\Roaming\Mozilla\Firefox\Profiles\$($firefoxProfile.Name)\places.sqlite" -Force -ErrorAction SilentlyContinue
-					#Hide-Console
+					Hide-Console
 					$FORM_PFMGMain.Show()
 				}
 			}
@@ -576,7 +577,7 @@ $BUTTON_Migrate.Add_Click({
 					}
 					if ($CHECKBOX_InternetExplorer.Checked)
 					{
-						robocopy "$($currentUserProfile)\Favorites" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Favorites" /s /np /eta /xf $toExclude desktop.ini | Write-Host
+						robocopy "$($currentUserProfile)\Favorites" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Favorites" /s /np /eta /xf $toExclude desktop.ini Bing.lnk | Write-Host
 					}
 					if ($CHECKBOX_Edge.Checked)
 					{
@@ -588,12 +589,9 @@ $BUTTON_Migrate.Add_Click({
 					}
 					if ($CHECKBOX_Firefox.Checked)
 					{
-						$firefoxProc = Get-Process firefox -ErrorAction SilentlyContinue
-						if (!($firefoxProc))
-						{
-							start "C:\Program Files\Mozilla Firefox\firefox.exe" "-headless"
-						}
-						Sleep 1
+						Start-Process "Firefox" -ArgumentList "-headless"
+						Start-Sleep 1
+						Stop-Process -Name Firefox -Force -ErrorAction SilentlyContinue
 						$firefoxProfile = Get-ChildItem -Path "$($currentUserProfile)\AppData\Roaming\Mozilla\Firefox\Profiles\" | Where-Object { $_.PSIsContainer } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 						New-Item -Path "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Firefox" -ItemType "directory" -ErrorAction SilentlyContinue
 						Copy-Item -Path "$($currentUserProfile)\AppData\Roaming\Mozilla\Firefox\Profiles\$($firefoxProfile.Name)\places.sqlite" -Destination "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Firefox\" -Force -ErrorAction SilentlyContinue
@@ -618,7 +616,7 @@ $BUTTON_Migrate.Add_Click({
 					$LABEL_ProfileFound.text = "Complete!"
 					$LABEL_ProfileFound.ForeColor = 'Green'
 					$FORM_PFMGMain.Show()
-					#Hide-Console
+					Hide-Console
 				}
 			}
 		}
