@@ -1,4 +1,4 @@
-$ver = "v1.0.4"
+$ver = "v1.0.5"
 $p = Get-Process -Name explorer
 $procId = $p.Id[0]
 $currentUser = (Get-WmiObject -Class Win32_Process -Filter "ProcessId=$($procId)").GetOwner().User
@@ -53,9 +53,9 @@ function Invoke-ScriptMultithreaded {
 	end {
 	}
 }
-if (!(Test-Path -Path "C:\ProgramData\PFMG-Data\logs"))
+if (!(Test-Path -Path "C:\ProgramData\PFMG-Data"))
 {
-	New-Item -Path "C:\ProgramData\PFMG-Data\logs" -ItemType "directory"
+	New-Item -Path "C:\ProgramData\PFMG-Data" -ItemType "directory"
 }
 $pathToJson = "C:\ProgramData\PFMG-Data\PFMG.json"
 if (!(Test-Path -Path $pathToJson))
@@ -121,7 +121,7 @@ Set-Content $pathToimportSize $importSize
 [System.Reflection.Assembly]::LoadWithPartialName('WindowsFormsIntegration') | Out-Null
 [void][System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms")
 [void][System.Reflection.Assembly]::LoadWithPartialName("System.Drawing")
-$icon = [System.Drawing.Icon]::ExtractAssociatedIcon("C:\Windows\System32\Microsoft.Uev.SyncController.exe")
+$icon = [System.Drawing.Icon]::ExtractAssociatedIcon("C:\Windows\WinSxS\wow64_microsoft-windows-wab-app_31bf3856ad364e35_10.0.17763.1_none_3dc3f1b8641ccc59\wabmig.exe")
 # CustomDialog
 $FORM_PFMGMain = New-Object System.Windows.Forms.Form
 Add-Type -AssemblyName System.Windows.Forms
@@ -525,11 +525,11 @@ $BUTTON_Migrate.Add_Click({
 					Show-Console
 					$FORM_PFMGMain.Hide()
 					$dateTimeLong = Get-Date -UFormat '+%Y-%m-%dT%H-%M-%S'
-					robocopy "$($TEXTBOX_BackupPath.text)\Desktop" "$($currentUserProfile)\Desktop" /s /np /eta /mov /xf $toExclude desktop.ini /LOG+:"C:\ProgramData\PFMG-Data\logs\$($dateTimeLong)" | Write-Host
-					robocopy "$($TEXTBOX_BackupPath.text)\Downloads" "$($currentUserProfile)\Downloads" /s /np /eta /mov /xf $toExclude desktop.ini /LOG+:"C:\ProgramData\PFMG-Data\logs\$($dateTimeLong)" | Write-Host
-					robocopy "$($TEXTBOX_BackupPath.text)\Documents" "$($currentUserProfile)\Documents" /s /np /eta /mov /xf $toExclude desktop.ini /LOG+:"C:\ProgramData\PFMG-Data\logs\$($dateTimeLong)" | Write-Host
-					robocopy "$($TEXTBOX_BackupPath.text)\Pictures" "$($currentUserProfile)\Pictures" /s /np /eta /mov /xf $toExclude desktop.ini /LOG+:"C:\ProgramData\PFMG-Data\logs\$($dateTimeLong)" | Write-Host
-					robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Favorites" "$($currentUserProfile)\Favorites" /s /np /eta /mov /xf $toExclude desktop.ini /LOG+:"C:\ProgramData\PFMG-Data\logs\$($dateTimeLong)" | Write-Host
+					robocopy "$($TEXTBOX_BackupPath.text)\Desktop" "$($currentUserProfile)\Desktop" /s /np /eta /mov /xf $toExclude desktop.ini | Write-Host
+					robocopy "$($TEXTBOX_BackupPath.text)\Downloads" "$($currentUserProfile)\Downloads" /s /np /eta /mov /xf $toExclude desktop.ini | Write-Host
+					robocopy "$($TEXTBOX_BackupPath.text)\Documents" "$($currentUserProfile)\Documents" /s /np /eta /mov /xf $toExclude desktop.ini | Write-Host
+					robocopy "$($TEXTBOX_BackupPath.text)\Pictures" "$($currentUserProfile)\Pictures" /s /np /eta /mov /xf $toExclude desktop.ini | Write-Host
+					robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Favorites" "$($currentUserProfile)\Favorites" /s /np /eta /mov /xf $toExclude desktop.ini | Write-Host
 					robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Edge" "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User" /s /np /eta /mov | Write-Host
 					New-Item -Path "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -ItemType "directory"
 					Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\GoogleChrome" -Destination "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -Force
@@ -539,11 +539,13 @@ $BUTTON_Migrate.Add_Click({
 					Sleep 1
 					$firefoxProfile = Get-ChildItem -Path "$($currentUserProfile)\AppData\Roaming\Mozilla\Firefox\Profiles\" | Where-Object { $_.PSIsContainer } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 					Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\Firefox\" -Destination "$($currentUserProfile)\AppData\Roaming\Mozilla\Firefox\Profiles\$($firefoxProfile.Name)\places.sqlite" -Force
+					#Hide-Console
+					$FORM_PFMGMain.Show()
 				}
 			}
 		}
-		$FORM_PFMGMain.Show()
-		#Hide-Console
+		
+		
 		else
 		{
 			$dateTime = Get-Date -UFormat '+%Y-%m-%d'
@@ -553,23 +555,23 @@ $BUTTON_Migrate.Add_Click({
 			$FORM_PFMGMain.Hide()
 			if ($CHECKBOX_Desktop.Checked)
 			{
-				robocopy "$($currentUserProfile)\Desktop" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Desktop" /s /np /eta /xf $toExclude desktop.ini /LOG+:"C:\ProgramData\PFMG-Data\logs\$($dateTimeLong)" | Write-Host
+				robocopy "$($currentUserProfile)\Desktop" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Desktop" /s /np /eta /xf $toExclude desktop.ini | Write-Host
 			}
 			if ($CHECKBOX_Downloads.Checked)
 			{
-				robocopy "$($currentUserProfile)\Downloads" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Downloads" /s /np /eta /xf $toExclude desktop.ini /LOG+:"C:\ProgramData\PFMG-Data\logs\$($dateTimeLong)" | Write-Host
+				robocopy "$($currentUserProfile)\Downloads" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Downloads" /s /np /eta /xf $toExclude desktop.ini | Write-Host
 			}
 			if ($CHECKBOX_Documents.Checked)
 			{
-				robocopy "$($currentUserProfile)\Documents" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Documents" /s /np /eta /xf $toExclude desktop.ini /LOG+:"C:\ProgramData\PFMG-Data\logs\$($dateTimeLong)" | Write-Host
+				robocopy "$($currentUserProfile)\Documents" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Documents" /s /np /eta /xf $toExclude desktop.ini | Write-Host
 			}
 			if ($CHECKBOX_Pictures.Checked)
 			{
-				robocopy "$($currentUserProfile)\Pictures" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Pictures" /s /np /eta /xf $toExclude desktop.ini /LOG+:"C:\ProgramData\PFMG-Data\logs\$($dateTimeLong)" | Write-Host
+				robocopy "$($currentUserProfile)\Pictures" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Pictures" /s /np /eta /xf $toExclude desktop.ini | Write-Host
 			}
 			if ($CHECKBOX_InternetExplorer.Checked)
 			{
-				robocopy "$($currentUserProfile)\Favorites" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Favorites" /s /np /eta /xf $toExclude desktop.ini /LOG+:"C:\ProgramData\PFMG-Data\logs\$($dateTimeLong)" | Write-Host
+				robocopy "$($currentUserProfile)\Favorites" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Favorites" /s /np /eta /xf $toExclude desktop.ini | Write-Host
 			}
 			if ($CHECKBOX_Edge.Checked)
 			{
@@ -588,8 +590,8 @@ $BUTTON_Migrate.Add_Click({
 				}
 				Sleep 1
 				$firefoxProfile = Get-ChildItem -Path "$($currentUserProfile)\AppData\Roaming\Mozilla\Firefox\Profiles\" | Where-Object { $_.PSIsContainer } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-				New-Item -Path "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Firefox" -ItemType "directory"
-				Copy-Item -Path "$($currentUserProfile)\AppData\Roaming\Mozilla\Firefox\Profiles\$($firefoxProfile.Name)\places.sqlite" -Destination "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Firefox\" -Force
+				New-Item -Path "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Firefox" -ItemType "directory" -ErrorAction SilentlyContinue
+				Copy-Item -Path "$($currentUserProfile)\AppData\Roaming\Mozilla\Firefox\Profiles\$($firefoxProfile.Name)\places.sqlite" -Destination "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Firefox\" -Force -ErrorAction SilentlyContinue
 			}
 			$pathToJsonProfile = "$($TEXTBOX_BackupPath.text)\$($mFileName)\jsonProfile.json"
 			$jsonProfile = @"
@@ -600,17 +602,17 @@ $BUTTON_Migrate.Add_Click({
   "dateTime": null
   }
 "@
-			New-Item $pathToJsonProfile
+			New-Item $pathToJsonProfile -ErrorAction SilentlyContinue
 			Set-Content $pathToJsonProfile $jsonProfile
 			$jsonProfile = Get-Content -Path $pathToJsonProfile -Raw | ConvertFrom-Json
 			$jsonProfile.UsernameValue = $currentUser
 			$jsonProfile.DomainValue = $env:USERDNSDOMAIN
 			$jsonProfile.HostnameValue = $env:COMPUTERNAME
 			$jsonProfile.dateTime = $dateTime
-			$jsonProfile | ConvertTo-Json | Set-Content $pathToJsonProfile
-			$FORM_PFMGMain.Show()
+			$jsonProfile | ConvertTo-Json | Set-Content $pathToJsonProfile		
 			$LABEL_ProfileFound.text = "Complete!"
 			$LABEL_ProfileFound.ForeColor = 'Green'
+			$FORM_PFMGMain.Show()
 			#Hide-Console
 		}
 	})
