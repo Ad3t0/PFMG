@@ -1,4 +1,4 @@
-$ver = "v1.0.3"
+$ver = "v1.0.4"
 $p = Get-Process -Name explorer
 $procId = $p.Id[0]
 $currentUser = (Get-WmiObject -Class Win32_Process -Filter "ProcessId=$($procId)").GetOwner().User
@@ -453,6 +453,7 @@ $TEXTBOX_BackupPath.Add_TextChanged({
 		}
 		else
 		{
+			$timerImport.stop()
 			$timer.start()
 			$BUTTON_Migrate.text = 'Export'
 			$LABEL_ProfileFound.text = ""
@@ -523,12 +524,13 @@ $BUTTON_Migrate.Add_Click({
 					$jsonProfile = Get-Content -Path $pathToJsonProfile -Raw | ConvertFrom-Json
 					Show-Console
 					$FORM_PFMGMain.Hide()
-					robocopy "$($TEXTBOX_BackupPath.text)\Desktop" "$($currentUserProfile)\Desktop" /s /np /eta /xf $toExclude desktop.ini | Write-Host
-					robocopy "$($TEXTBOX_BackupPath.text)\Downloads" "$($currentUserProfile)\Downloads" /s /np /eta /xf $toExclude desktop.ini | Write-Host
-					robocopy "$($TEXTBOX_BackupPath.text)\Documents" "$($currentUserProfile)\Documents" /s /np /eta /xf $toExclude desktop.ini | Write-Host
-					robocopy "$($TEXTBOX_BackupPath.text)\Pictures" "$($currentUserProfile)\Pictures" /s /np /eta /xf $toExclude desktop.ini | Write-Host
-					robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Favorites" "$($currentUserProfile)\Favorites" /s /np /eta /xf $toExclude desktop.ini | Write-Host
-					robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Edge" "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User" /s /np /eta /xf $toExclude | Write-Host
+					$dateTimeLong = Get-Date -UFormat '+%Y-%m-%dT%H-%M-%S'
+					robocopy "$($TEXTBOX_BackupPath.text)\Desktop" "$($currentUserProfile)\Desktop" /s /np /eta /mov /xf $toExclude desktop.ini /LOG+:"C:\ProgramData\PFMG-Data\logs\$($dateTimeLong)" | Write-Host
+					robocopy "$($TEXTBOX_BackupPath.text)\Downloads" "$($currentUserProfile)\Downloads" /s /np /eta /mov /xf $toExclude desktop.ini /LOG+:"C:\ProgramData\PFMG-Data\logs\$($dateTimeLong)" | Write-Host
+					robocopy "$($TEXTBOX_BackupPath.text)\Documents" "$($currentUserProfile)\Documents" /s /np /eta /mov /xf $toExclude desktop.ini /LOG+:"C:\ProgramData\PFMG-Data\logs\$($dateTimeLong)" | Write-Host
+					robocopy "$($TEXTBOX_BackupPath.text)\Pictures" "$($currentUserProfile)\Pictures" /s /np /eta /mov /xf $toExclude desktop.ini /LOG+:"C:\ProgramData\PFMG-Data\logs\$($dateTimeLong)" | Write-Host
+					robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Favorites" "$($currentUserProfile)\Favorites" /s /np /eta /mov /xf $toExclude desktop.ini /LOG+:"C:\ProgramData\PFMG-Data\logs\$($dateTimeLong)" | Write-Host
+					robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Edge" "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User" /s /np /eta /mov | Write-Host
 					New-Item -Path "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -ItemType "directory"
 					Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\GoogleChrome" -Destination "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -Force
 					Start-Process -Name Firefox -ArgumentList "-headless"
@@ -551,27 +553,27 @@ $BUTTON_Migrate.Add_Click({
 			$FORM_PFMGMain.Hide()
 			if ($CHECKBOX_Desktop.Checked)
 			{
-				robocopy "$($currentUserProfile)\Desktop" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Desktop" /s /np /eta /xf $toExclude desktop.ini | Write-Host
+				robocopy "$($currentUserProfile)\Desktop" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Desktop" /s /np /eta /xf $toExclude desktop.ini /LOG+:"C:\ProgramData\PFMG-Data\logs\$($dateTimeLong)" | Write-Host
 			}
 			if ($CHECKBOX_Downloads.Checked)
 			{
-				robocopy "$($currentUserProfile)\Downloads" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Downloads" /s /np /eta /xf $toExclude desktop.ini | Write-Host
+				robocopy "$($currentUserProfile)\Downloads" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Downloads" /s /np /eta /xf $toExclude desktop.ini /LOG+:"C:\ProgramData\PFMG-Data\logs\$($dateTimeLong)" | Write-Host
 			}
 			if ($CHECKBOX_Documents.Checked)
 			{
-				robocopy "$($currentUserProfile)\Documents" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Documents" /s /np /eta /xf $toExclude desktop.ini | Write-Host
+				robocopy "$($currentUserProfile)\Documents" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Documents" /s /np /eta /xf $toExclude desktop.ini /LOG+:"C:\ProgramData\PFMG-Data\logs\$($dateTimeLong)" | Write-Host
 			}
 			if ($CHECKBOX_Pictures.Checked)
 			{
-				robocopy "$($currentUserProfile)\Pictures" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Pictures" /s /np /eta /xf $toExclude desktop.ini | Write-Host
+				robocopy "$($currentUserProfile)\Pictures" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Pictures" /s /np /eta /xf $toExclude desktop.ini /LOG+:"C:\ProgramData\PFMG-Data\logs\$($dateTimeLong)" | Write-Host
 			}
 			if ($CHECKBOX_InternetExplorer.Checked)
 			{
-				robocopy "$($currentUserProfile)\Favorites" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Favorites" /s /np /eta /xf $toExclude desktop.ini | Write-Host
+				robocopy "$($currentUserProfile)\Favorites" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Favorites" /s /np /eta /xf $toExclude desktop.ini /LOG+:"C:\ProgramData\PFMG-Data\logs\$($dateTimeLong)" | Write-Host
 			}
 			if ($CHECKBOX_Edge.Checked)
 			{
-				robocopy "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Edge" /s /np /eta /xf $toExclude | Write-Host
+				robocopy "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Edge" /s /np /eta | Write-Host
 			}
 			if ($CHECKBOX_GoogleChrome.Checked)
 			{
