@@ -1,4 +1,4 @@
-$ver = "v1.0.6"
+$ver = "v1.0.7"
 $p = Get-Process -Name explorer
 $procId = $p.Id[0]
 $currentUser = (Get-WmiObject -Class Win32_Process -Filter "ProcessId=$($procId)").GetOwner().User
@@ -121,7 +121,7 @@ Set-Content $pathToimportSize $importSize
 [System.Reflection.Assembly]::LoadWithPartialName('WindowsFormsIntegration') | Out-Null
 [void][System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms")
 [void][System.Reflection.Assembly]::LoadWithPartialName("System.Drawing")
-$icon = [System.Drawing.Icon]::ExtractAssociatedIcon("C:\Windows\WinSxS\wow64_microsoft-windows-wab-app_31bf3856ad364e35_10.0.17763.1_none_3dc3f1b8641ccc59\wabmig.exe")
+$icon = [System.Drawing.Icon]::ExtractAssociatedIcon("C:\Windows\system32\cleanmgr.exe")
 # CustomDialog
 $FORM_PFMGMain = New-Object System.Windows.Forms.Form
 Add-Type -AssemblyName System.Windows.Forms
@@ -518,8 +518,8 @@ $BUTTON_Migrate.Add_Click({
 			switch ($importConfirm) {
 				'Yes' {
 					Stop-Process -Name MicrosoftEdge -Force -ErrorAction SilentlyContinue
-					Stop-Process -Name Firefox -Force -Force -ErrorAction SilentlyContinue
-					Stop-Process -Name Chrome -Force -Force -ErrorAction SilentlyContinue
+					Stop-Process -Name Firefox -Force -ErrorAction SilentlyContinue
+					Stop-Process -Name Chrome -Force -ErrorAction SilentlyContinue
 					$pathToJsonProfile = "$($TEXTBOX_BackupPath.text)\jsonProfile.json"
 					$jsonProfile = Get-Content -Path $pathToJsonProfile -Raw | ConvertFrom-Json
 					Show-Console
@@ -531,13 +531,13 @@ $BUTTON_Migrate.Add_Click({
 					robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Favorites" "$($currentUserProfile)\Favorites" /s /np /eta /mov /xf $toExclude desktop.ini | Write-Host
 					robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Edge" "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User" /s /np /eta /mov | Write-Host
 					New-Item -Path "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -ItemType "directory" -Force -ErrorAction SilentlyContinue
-					Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\GoogleChrome" -Destination "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -Force -Force -ErrorAction SilentlyContinue
-					Start-Process -Name Firefox -ArgumentList "-headless" -Force -ErrorAction SilentlyContinue
+					Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\GoogleChrome" -Destination "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -Force -ErrorAction SilentlyContinue
+					Start-Process "Firefox" -ArgumentList "-headless" -Force -ErrorAction SilentlyContinue
 					Sleep 1
-					Stop-Process -Name Firefox -Force -Force -ErrorAction SilentlyContinue
+					Stop-Process -Name Firefox -Force -ErrorAction SilentlyContinue
 					Sleep 1
 					$firefoxProfile = Get-ChildItem -Path "$($currentUserProfile)\AppData\Roaming\Mozilla\Firefox\Profiles\" | Where-Object { $_.PSIsContainer } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-					Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\Firefox\places.sqlite" -Destination "$($currentUserProfile)\AppData\Roaming\Mozilla\Firefox\Profiles\$($firefoxProfile.Name)\places.sqlite" -Force -Force -ErrorAction SilentlyContinue
+					Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\Firefox\places.sqlite" -Destination "$($currentUserProfile)\AppData\Roaming\Mozilla\Firefox\Profiles\$($firefoxProfile.Name)\places.sqlite" -Force -ErrorAction SilentlyContinue
 					#Hide-Console
 					$FORM_PFMGMain.Show()
 				}
