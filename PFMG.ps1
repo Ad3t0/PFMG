@@ -1,4 +1,4 @@
-$ver = "v1.0.1"
+$ver = "v1.0.2"
 $p = Get-Process -Name explorer
 $procId = $p.Id[0]
 $currentUser = (Get-WmiObject -Class Win32_Process -Filter "ProcessId=$($procId)").GetOwner().User
@@ -511,7 +511,7 @@ $BUTTON_PathSelection.Add_Click({
 		$TEXTBOX_BackupPath.text = Get-Folder
 	})
 $BUTTON_Migrate.Add_Click({
-		if (Test-Path -Path "$TEXTBOX_BackupPath.text\jsonProfile.json")
+		if (Test-Path -Path "$($TEXTBOX_BackupPath.text)\jsonProfile.json")
 		{
 			$pathToJsonProfile = "$($TEXTBOX_BackupPath.text)\jsonProfile.json"
 			$jsonProfile = Get-Content -Path $pathToJsonProfile -Raw | ConvertFrom-Json
