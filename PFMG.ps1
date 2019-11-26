@@ -1,3 +1,4 @@
+$ver = "v1.0.1"
 $p = Get-Process -Name explorer
 $procId = $p.Id[0]
 $currentUser = (Get-WmiObject -Class Win32_Process -Filter "ProcessId=$($procId)").GetOwner().User
@@ -273,7 +274,7 @@ $LABEL_HostnameValue.height = 10
 $LABEL_HostnameValue.location = New-Object System.Drawing.Point (90,67)
 $LABEL_HostnameValue.Font = 'Microsoft Sans Serif,10'
 $LABEL_Version = New-Object system.Windows.Forms.Label
-$LABEL_Version.text = "v1.0.0"
+$LABEL_Version.text = $ver
 $LABEL_Version.AutoSize = $true
 $LABEL_Version.width = 25
 $LABEL_Version.height = 10
@@ -310,7 +311,7 @@ $GROUPBOX_Excluded.controls.AddRange(@($TEXTBOX_Excluded))
 #
 $FORM_PFMGMain.Add_Shown({
 		$FORM_PFMGMain.Activate()
-		Hide-Console
+		#Hide-Console
 	})
 $LISTBOX_MigrateInfo.Items.Add("Loading...")
 $LABEL_ProfileFound.ForeColor = 'Green'
@@ -518,31 +519,31 @@ $BUTTON_Migrate.Add_Click({
 			$FORM_PFMGMain.Hide()
 			if ($CHECKBOX_Desktop.Checked)
 			{
-				robocopy "$($TEXTBOX_BackupPath.text)\$($mFileName)\Desktop" "$($currentUserProfile)\Desktop" /s /np /eta /xf $toExclude desktop.ini | Write-Host
+				robocopy "$($TEXTBOX_BackupPath.text)\Desktop" "$($currentUserProfile)\Desktop" /s /np /eta /xf $toExclude desktop.ini | Write-Host
 			}
 			if ($CHECKBOX_Downloads.Checked)
 			{
-				robocopy "$($TEXTBOX_BackupPath.text)\$($mFileName)\Downloads" "$($currentUserProfile)\Downloads" /s /np /eta /xf $toExclude desktop.ini | Write-Host
+				robocopy "$($TEXTBOX_BackupPath.text)\Downloads" "$($currentUserProfile)\Downloads" /s /np /eta /xf $toExclude desktop.ini | Write-Host
 			}
 			if ($CHECKBOX_Documents.Checked)
 			{
-				robocopy "$($TEXTBOX_BackupPath.text)\$($mFileName)\Documents" "$($currentUserProfile)\Documents" /s /np /eta /xf $toExclude desktop.ini | Write-Host
+				robocopy "$($TEXTBOX_BackupPath.text)\Documents" "$($currentUserProfile)\Documents" /s /np /eta /xf $toExclude desktop.ini | Write-Host
 			}
 			if ($CHECKBOX_Pictures.Checked)
 			{
-				robocopy "$($TEXTBOX_BackupPath.text)\$($mFileName)\Pictures" "$($currentUserProfile)\Pictures" /s /np /eta /xf $toExclude desktop.ini | Write-Host
+				robocopy "$($TEXTBOX_BackupPath.text)\Pictures" "$($currentUserProfile)\Pictures" /s /np /eta /xf $toExclude desktop.ini | Write-Host
 			}
 			if ($CHECKBOX_InternetExplorer.Checked)
 			{
-				robocopy "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Favorites" "$($currentUserProfile)\Favorites" /s /np /eta /xf $toExclude desktop.ini | Write-Host
+				robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Favorites" "$($currentUserProfile)\Favorites" /s /np /eta /xf $toExclude desktop.ini | Write-Host
 			}
 			if ($CHECKBOX_Edge.Checked)
 			{
-				robocopy "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Edge" "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User" /s /np /eta /xf $toExclude | Write-Host
+				robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Edge" "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User" /s /np /eta /xf $toExclude | Write-Host
 			}
 			if ($CHECKBOX_GoogleChrome.Checked)
 			{
-				Copy-Item -Path "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\GoogleChrome" -Destination "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -Force
+				Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\GoogleChrome" -Destination "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -Force
 			}
 			if ($CHECKBOX_Firefox.Checked)
 			{
@@ -553,10 +554,10 @@ $BUTTON_Migrate.Add_Click({
 				}
 				Sleep 1
 				$firefoxProfile = Get-ChildItem -Path "$($currentUserProfile)\AppData\Roaming\Mozilla\Firefox\Profiles\" | Where-Object { $_.PSIsContainer } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-				Copy-Item -Path "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Firefox\" -Destination "$($currentUserProfile)\AppData\Roaming\Mozilla\Firefox\Profiles\$($firefoxProfile.Name)\places.sqlite" -Force
+				Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\Firefox\" -Destination "$($currentUserProfile)\AppData\Roaming\Mozilla\Firefox\Profiles\$($firefoxProfile.Name)\places.sqlite" -Force
 			}
 			$FORM_PFMGMain.Show()
-			Hide-Console
+			#Hide-Console
 		}
 		else
 		{
@@ -625,7 +626,7 @@ $BUTTON_Migrate.Add_Click({
 			$FORM_PFMGMain.Show()
 			$LABEL_ProfileFound.text = "Complete!"
 			$LABEL_ProfileFound.ForeColor = 'Green'
-			Hide-Console
+			#Hide-Console
 		}
 	})
 #
