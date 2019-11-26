@@ -1,4 +1,4 @@
-$ver = "v1.0.2"
+$ver = "v1.0.3"
 $p = Get-Process -Name explorer
 $procId = $p.Id[0]
 $currentUser = (Get-WmiObject -Class Win32_Process -Filter "ProcessId=$($procId)").GetOwner().User
@@ -86,10 +86,10 @@ $procId = $p.Id[0]
 $currentUser = (Get-WmiObject -Class Win32_Process -Filter "ProcessId=$($procId)").GetOwner().User
 $currentUserProfile = "C:\Users\$($currentUser)"
 $toExclude = $jsonSettings.exclude.Split(" ")
-$exportSizeDesktop = "{0:N2}" -f ((Get-ChildItem "$($currentUserProfile)\Desktop" -Recurse -Exclude $toExclude | Measure-Object -Property Length -Sum -ErrorAction SilentlyContinue).Sum / 1GB)
-$exportSizeDownloads = "{0:N2}" -f ((Get-ChildItem "$($currentUserProfile)\Downloads" -Recurse -Exclude $toExclude | Measure-Object -Property Length -Sum -ErrorAction SilentlyContinue).Sum / 1GB)
-$exportSizeDocuments = "{0:N2}" -f ((Get-ChildItem "$($currentUserProfile)\Documents" -Recurse -Exclude $toExclude | Measure-Object -Property Length -Sum -ErrorAction SilentlyContinue).Sum / 1GB)
-$exportSizePictures = "{0:N2}" -f ((Get-ChildItem "$($currentUserProfile)\Pictures" -Recurse -Exclude $toExclude | Measure-Object -Property Length -Sum -ErrorAction SilentlyContinue).Sum / 1GB)
+$exportSizeDesktop = "{0:N2}" -f ((Get-ChildItem "$($currentUserProfile)\Desktop" -Recurse -Exclude $toExclude | Measure-Object -Property Length -Sum).Sum / 1GB)
+$exportSizeDownloads = "{0:N2}" -f ((Get-ChildItem "$($currentUserProfile)\Downloads" -Recurse -Exclude $toExclude | Measure-Object -Property Length -Sum).Sum / 1GB)
+$exportSizeDocuments = "{0:N2}" -f ((Get-ChildItem "$($currentUserProfile)\Documents" -Recurse -Exclude $toExclude | Measure-Object -Property Length -Sum).Sum / 1GB)
+$exportSizePictures = "{0:N2}" -f ((Get-ChildItem "$($currentUserProfile)\Pictures" -Recurse -Exclude $toExclude | Measure-Object -Property Length -Sum).Sum / 1GB)
 $jsonSettings.exportSizeDesktop = [math]::Round($exportSizeDesktop,3)
 $jsonSettings.exportSizeDownloads = [math]::Round($exportSizeDownloads,3)
 $jsonSettings.exportSizeDocuments = [math]::Round($exportSizeDocuments,3)
@@ -102,10 +102,10 @@ Set-Content $pathToexportSize $exportSize
 $importSize = @'
 $pathToJson = "C:\ProgramData\PFMG-Data\PFMG.json"
 $jsonSettings = Get-Content -Path $pathToJson -Raw | ConvertFrom-Json
-$importSizeDesktop = "{0:N2}" -f ((Get-ChildItem "$($jsonSettings.path)\Desktop" -Recurse | Measure-Object -Property Length -Sum -ErrorAction SilentlyContinue).Sum / 1GB)
-$importSizeDownloads = "{0:N2}" -f ((Get-ChildItem "$($jsonSettings.path)\Downloads" -Recurse | Measure-Object -Property Length -Sum -ErrorAction SilentlyContinue).Sum / 1GB)
-$importSizeDocuments = "{0:N2}" -f ((Get-ChildItem "$($jsonSettings.path)\Documents" -Recurse | Measure-Object -Property Length -Sum -ErrorAction SilentlyContinue).Sum / 1GB)
-$importSizePictures = "{0:N2}" -f ((Get-ChildItem "$($jsonSettings.path)\Pictures" -Recurse | Measure-Object -Property Length -Sum -ErrorAction SilentlyContinue).Sum / 1GB)
+$importSizeDesktop = "{0:N2}" -f ((Get-ChildItem "$($jsonSettings.path)\Desktop" -Recurse | Measure-Object -Property Length -Sum).Sum / 1GB)
+$importSizeDownloads = "{0:N2}" -f ((Get-ChildItem "$($jsonSettings.path)\Downloads" -Recurse | Measure-Object -Property Length -Sum).Sum / 1GB)
+$importSizeDocuments = "{0:N2}" -f ((Get-ChildItem "$($jsonSettings.path)\Documents" -Recurse | Measure-Object -Property Length -Sum).Sum / 1GB)
+$importSizePictures = "{0:N2}" -f ((Get-ChildItem "$($jsonSettings.path)\Pictures" -Recurse | Measure-Object -Property Length -Sum).Sum / 1GB)
 $jsonSettings.importSizeDesktop = [math]::Round($importSizeDesktop,3)
 $jsonSettings.importSizeDownloads = [math]::Round($importSizeDownloads,3)
 $jsonSettings.importSizeDocuments = [math]::Round($importSizeDocuments,3)
@@ -513,52 +513,35 @@ $BUTTON_PathSelection.Add_Click({
 $BUTTON_Migrate.Add_Click({
 		if (Test-Path -Path "$($TEXTBOX_BackupPath.text)\jsonProfile.json")
 		{
-			$pathToJsonProfile = "$($TEXTBOX_BackupPath.text)\jsonProfile.json"
-			$jsonProfile = Get-Content -Path $pathToJsonProfile -Raw | ConvertFrom-Json
-			Show-Console
-			$FORM_PFMGMain.Hide()
-			if ($CHECKBOX_Desktop.Checked)
-			{
-				robocopy "$($TEXTBOX_BackupPath.text)\Desktop" "$($currentUserProfile)\Desktop" /s /np /eta /xf $toExclude desktop.ini | Write-Host
-			}
-			if ($CHECKBOX_Downloads.Checked)
-			{
-				robocopy "$($TEXTBOX_BackupPath.text)\Downloads" "$($currentUserProfile)\Downloads" /s /np /eta /xf $toExclude desktop.ini | Write-Host
-			}
-			if ($CHECKBOX_Documents.Checked)
-			{
-				robocopy "$($TEXTBOX_BackupPath.text)\Documents" "$($currentUserProfile)\Documents" /s /np /eta /xf $toExclude desktop.ini | Write-Host
-			}
-			if ($CHECKBOX_Pictures.Checked)
-			{
-				robocopy "$($TEXTBOX_BackupPath.text)\Pictures" "$($currentUserProfile)\Pictures" /s /np /eta /xf $toExclude desktop.ini | Write-Host
-			}
-			if ($CHECKBOX_InternetExplorer.Checked)
-			{
-				robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Favorites" "$($currentUserProfile)\Favorites" /s /np /eta /xf $toExclude desktop.ini | Write-Host
-			}
-			if ($CHECKBOX_Edge.Checked)
-			{
-				robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Edge" "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User" /s /np /eta /xf $toExclude | Write-Host
-			}
-			if ($CHECKBOX_GoogleChrome.Checked)
-			{
-				Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\GoogleChrome" -Destination "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -Force
-			}
-			if ($CHECKBOX_Firefox.Checked)
-			{
-				$firefoxProc = Get-Process firefox -ErrorAction SilentlyContinue
-				if (!($firefoxProc))
-				{
-					start "C:\Program Files\Mozilla Firefox\firefox.exe" "-headless"
+			$importConfirm = [System.Windows.MessageBox]::Show('All open web browsers will be force closed before the import. Are you sure?','Profile Import','YesNo','Warning')
+			switch ($importConfirm) {
+				'Yes' {
+					Stop-Process -Name MicrosoftEdge -Force -ErrorAction SilentlyContinue
+					Stop-Process -Name Firefox -Force
+					Stop-Process -Name Chrome -Force
+					$pathToJsonProfile = "$($TEXTBOX_BackupPath.text)\jsonProfile.json"
+					$jsonProfile = Get-Content -Path $pathToJsonProfile -Raw | ConvertFrom-Json
+					Show-Console
+					$FORM_PFMGMain.Hide()
+					robocopy "$($TEXTBOX_BackupPath.text)\Desktop" "$($currentUserProfile)\Desktop" /s /np /eta /xf $toExclude desktop.ini | Write-Host
+					robocopy "$($TEXTBOX_BackupPath.text)\Downloads" "$($currentUserProfile)\Downloads" /s /np /eta /xf $toExclude desktop.ini | Write-Host
+					robocopy "$($TEXTBOX_BackupPath.text)\Documents" "$($currentUserProfile)\Documents" /s /np /eta /xf $toExclude desktop.ini | Write-Host
+					robocopy "$($TEXTBOX_BackupPath.text)\Pictures" "$($currentUserProfile)\Pictures" /s /np /eta /xf $toExclude desktop.ini | Write-Host
+					robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Favorites" "$($currentUserProfile)\Favorites" /s /np /eta /xf $toExclude desktop.ini | Write-Host
+					robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Edge" "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User" /s /np /eta /xf $toExclude | Write-Host
+					New-Item -Path "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -ItemType "directory"
+					Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\GoogleChrome" -Destination "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -Force
+					Start-Process -Name Firefox -ArgumentList "-headless"
+					Sleep 1
+					Stop-Process -Name Firefox -Force
+					Sleep 1
+					$firefoxProfile = Get-ChildItem -Path "$($currentUserProfile)\AppData\Roaming\Mozilla\Firefox\Profiles\" | Where-Object { $_.PSIsContainer } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+					Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\Firefox\" -Destination "$($currentUserProfile)\AppData\Roaming\Mozilla\Firefox\Profiles\$($firefoxProfile.Name)\places.sqlite" -Force
 				}
-				Sleep 1
-				$firefoxProfile = Get-ChildItem -Path "$($currentUserProfile)\AppData\Roaming\Mozilla\Firefox\Profiles\" | Where-Object { $_.PSIsContainer } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-				Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\Firefox\" -Destination "$($currentUserProfile)\AppData\Roaming\Mozilla\Firefox\Profiles\$($firefoxProfile.Name)\places.sqlite" -Force
 			}
-			$FORM_PFMGMain.Show()
-			#Hide-Console
 		}
+		$FORM_PFMGMain.Show()
+		#Hide-Console
 		else
 		{
 			$dateTime = Get-Date -UFormat '+%Y-%m-%d'
