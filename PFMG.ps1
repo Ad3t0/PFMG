@@ -1,8 +1,9 @@
-$ver = "v1.0.9"
+$ver = "v1.1.0"
 $p = Get-Process -Name explorer
 $procId = $p.Id[0]
 $currentUser = (Get-WmiObject -Class Win32_Process -Filter "ProcessId=$($procId)").GetOwner().User
 $currentUserProfile = "C:\Users\$($currentUser)"
+$pcStats = Get-CimInstance -ClassName Win32_ComputerSystem
 $OS = Get-CimInstance Win32_OperatingSystem
 Add-Type -Name Window -Namespace Console -MemberDefinition '
 [DllImport("Kernel32.dll")]
@@ -134,175 +135,131 @@ $GROUPBOX_MigrationPath = New-Object system.Windows.Forms.Groupbox
 $GROUPBOX_MigrationPath.height = 55
 $GROUPBOX_MigrationPath.width = 480
 $GROUPBOX_MigrationPath.text = "Migration Path"
-$GROUPBOX_MigrationPath.location = New-Object System.Drawing.Point (10, 15)
+$GROUPBOX_MigrationPath.location = New-Object System.Drawing.Point(10, 15)
 $TEXTBOX_BackupPath = New-Object system.Windows.Forms.TextBox
 $TEXTBOX_BackupPath.multiline = $false
 $TEXTBOX_BackupPath.width = 405
 $TEXTBOX_BackupPath.height = 20
-$TEXTBOX_BackupPath.location = New-Object System.Drawing.Point (15, 20)
+$TEXTBOX_BackupPath.location = New-Object System.Drawing.Point(15, 20)
 $TEXTBOX_BackupPath.Font = 'Microsoft Sans Serif,10'
 $BUTTON_PathSelection = New-Object system.Windows.Forms.Button
 $BUTTON_PathSelection.text = "..."
 $BUTTON_PathSelection.width = 30
 $BUTTON_PathSelection.height = 30
-$BUTTON_PathSelection.location = New-Object System.Drawing.Point (435, 15)
+$BUTTON_PathSelection.location = New-Object System.Drawing.Point(435, 15)
 $BUTTON_PathSelection.Font = 'Microsoft Sans Serif,10'
-$GROUPBOX_ProfileStats = New-Object system.Windows.Forms.Groupbox
-$GROUPBOX_ProfileStats.height = 90
-$GROUPBOX_ProfileStats.width = 245
-$GROUPBOX_ProfileStats.text = "Profile Information"
-$GROUPBOX_ProfileStats.location = New-Object System.Drawing.Point (245, 80)
 $GROUPBOX_Folders = New-Object system.Windows.Forms.Groupbox
 $GROUPBOX_Folders.height = 90
 $GROUPBOX_Folders.width = 225
 $GROUPBOX_Folders.text = "Folders"
-$GROUPBOX_Folders.location = New-Object System.Drawing.Point (10, 80)
+$GROUPBOX_Folders.location = New-Object System.Drawing.Point(10, 80)
 $CHECKBOX_Desktop = New-Object system.Windows.Forms.CheckBox
 $CHECKBOX_Desktop.text = "Desktop"
 $CHECKBOX_Desktop.AutoSize = $false
 $CHECKBOX_Desktop.width = 80
 $CHECKBOX_Desktop.height = 20
-$CHECKBOX_Desktop.location = New-Object System.Drawing.Point (20, 20)
+$CHECKBOX_Desktop.location = New-Object System.Drawing.Point(20, 20)
 $CHECKBOX_Desktop.Font = 'Microsoft Sans Serif,10'
 $CHECKBOX_Documents = New-Object system.Windows.Forms.CheckBox
 $CHECKBOX_Documents.text = "Documents"
 $CHECKBOX_Documents.AutoSize = $false
 $CHECKBOX_Documents.width = 100
 $CHECKBOX_Documents.height = 20
-$CHECKBOX_Documents.location = New-Object System.Drawing.Point (20, 55)
+$CHECKBOX_Documents.location = New-Object System.Drawing.Point(20, 55)
 $CHECKBOX_Documents.Font = 'Microsoft Sans Serif,10'
 $CHECKBOX_Pictures = New-Object system.Windows.Forms.CheckBox
 $CHECKBOX_Pictures.text = "Pictures"
 $CHECKBOX_Pictures.AutoSize = $false
 $CHECKBOX_Pictures.width = 90
 $CHECKBOX_Pictures.height = 20
-$CHECKBOX_Pictures.location = New-Object System.Drawing.Point (130, 55)
+$CHECKBOX_Pictures.location = New-Object System.Drawing.Point(130, 55)
 $CHECKBOX_Pictures.Font = 'Microsoft Sans Serif,10'
 $CHECKBOX_Downloads = New-Object system.Windows.Forms.CheckBox
 $CHECKBOX_Downloads.text = "Downloads"
 $CHECKBOX_Downloads.AutoSize = $false
 $CHECKBOX_Downloads.width = 90
 $CHECKBOX_Downloads.height = 20
-$CHECKBOX_Downloads.location = New-Object System.Drawing.Point (130, 20)
+$CHECKBOX_Downloads.location = New-Object System.Drawing.Point(130, 20)
 $CHECKBOX_Downloads.Font = 'Microsoft Sans Serif,10'
 $GROUPBOX_Bookmarks = New-Object system.Windows.Forms.Groupbox
 $GROUPBOX_Bookmarks.height = 90
 $GROUPBOX_Bookmarks.width = 225
 $GROUPBOX_Bookmarks.text = "Bookmarks"
-$GROUPBOX_Bookmarks.location = New-Object System.Drawing.Point (10, 180)
+$GROUPBOX_Bookmarks.location = New-Object System.Drawing.Point(10, 180)
 $CHECKBOX_InternetExplorer = New-Object system.Windows.Forms.CheckBox
 $CHECKBOX_InternetExplorer.text = "Internet Explorer"
 $CHECKBOX_InternetExplorer.AutoSize = $false
 $CHECKBOX_InternetExplorer.width = 125
 $CHECKBOX_InternetExplorer.height = 20
-$CHECKBOX_InternetExplorer.location = New-Object System.Drawing.Point (20, 20)
+$CHECKBOX_InternetExplorer.location = New-Object System.Drawing.Point(20, 20)
 $CHECKBOX_InternetExplorer.Font = 'Microsoft Sans Serif,10'
 $CHECKBOX_Edge = New-Object system.Windows.Forms.CheckBox
 $CHECKBOX_Edge.text = "Edge"
 $CHECKBOX_Edge.AutoSize = $false
 $CHECKBOX_Edge.width = 60
 $CHECKBOX_Edge.height = 20
-$CHECKBOX_Edge.location = New-Object System.Drawing.Point (150, 20)
+$CHECKBOX_Edge.location = New-Object System.Drawing.Point(150, 20)
 $CHECKBOX_Edge.Font = 'Microsoft Sans Serif,10'
 $CHECKBOX_Firefox = New-Object system.Windows.Forms.CheckBox
 $CHECKBOX_Firefox.text = "Firefox"
 $CHECKBOX_Firefox.AutoSize = $false
 $CHECKBOX_Firefox.width = 70
 $CHECKBOX_Firefox.height = 20
-$CHECKBOX_Firefox.location = New-Object System.Drawing.Point (20, 55)
+$CHECKBOX_Firefox.location = New-Object System.Drawing.Point(20, 55)
 $CHECKBOX_Firefox.Font = 'Microsoft Sans Serif,10'
 $CHECKBOX_GoogleChrome = New-Object system.Windows.Forms.CheckBox
 $CHECKBOX_GoogleChrome.text = "Google Chrome"
 $CHECKBOX_GoogleChrome.AutoSize = $false
 $CHECKBOX_GoogleChrome.width = 125
 $CHECKBOX_GoogleChrome.height = 20
-$CHECKBOX_GoogleChrome.location = New-Object System.Drawing.Point (95, 55)
+$CHECKBOX_GoogleChrome.location = New-Object System.Drawing.Point(95, 55)
 $CHECKBOX_GoogleChrome.Font = 'Microsoft Sans Serif,10'
 $BUTTON_Exit = New-Object system.Windows.Forms.Button
 $BUTTON_Exit.text = "Exit"
 $BUTTON_Exit.width = 90
 $BUTTON_Exit.height = 30
-$BUTTON_Exit.location = New-Object System.Drawing.Point (400, 340)
+$BUTTON_Exit.location = New-Object System.Drawing.Point(400, 340)
 $BUTTON_Exit.Font = 'Microsoft Sans Serif,10'
 $BUTTON_Migrate = New-Object system.Windows.Forms.Button
 $BUTTON_Migrate.text = "Migrate"
 $BUTTON_Migrate.width = 90
 $BUTTON_Migrate.height = 30
-$BUTTON_Migrate.location = New-Object System.Drawing.Point (285, 340)
+$BUTTON_Migrate.location = New-Object System.Drawing.Point(285, 340)
 $BUTTON_Migrate.Font = 'Microsoft Sans Serif,10'
-$LABEL_Username = New-Object system.Windows.Forms.Label
-$LABEL_Username.text = "Username:"
-$LABEL_Username.AutoSize = $true
-$LABEL_Username.width = 40
-$LABEL_Username.height = 10
-$LABEL_Username.location = New-Object System.Drawing.Point (12, 17)
-$LABEL_Username.Font = 'Microsoft Sans Serif,10'
-$LABEL_Domain = New-Object system.Windows.Forms.Label
-$LABEL_Domain.text = "Domain:"
-$LABEL_Domain.AutoSize = $true
-$LABEL_Domain.width = 40
-$LABEL_Domain.height = 10
-$LABEL_Domain.location = New-Object System.Drawing.Point (28, 42)
-$LABEL_Domain.Font = 'Microsoft Sans Serif,10'
-$LABEL_Hostname = New-Object system.Windows.Forms.Label
-$LABEL_Hostname.text = "Hostname:"
-$LABEL_Hostname.AutoSize = $true
-$LABEL_Hostname.width = 40
-$LABEL_Hostname.height = 10
-$LABEL_Hostname.location = New-Object System.Drawing.Point (14, 67)
-$LABEL_Hostname.Font = 'Microsoft Sans Serif,10'
-$LABEL_UsernameValue = New-Object system.Windows.Forms.Label
-$LABEL_UsernameValue.AutoSize = $true
-$LABEL_UsernameValue.width = 25
-$LABEL_UsernameValue.height = 10
-$LABEL_UsernameValue.location = New-Object System.Drawing.Point (90, 17)
-$LABEL_UsernameValue.Font = 'Microsoft Sans Serif,10'
-$LABEL_DomainValue = New-Object system.Windows.Forms.Label
-$LABEL_DomainValue.AutoSize = $true
-$LABEL_DomainValue.width = 25
-$LABEL_DomainValue.height = 10
-$LABEL_DomainValue.location = New-Object System.Drawing.Point (90, 42)
-$LABEL_DomainValue.Font = 'Microsoft Sans Serif,10'
-$LABEL_HostnameValue = New-Object system.Windows.Forms.Label
-$LABEL_HostnameValue.AutoSize = $true
-$LABEL_HostnameValue.width = 25
-$LABEL_HostnameValue.height = 10
-$LABEL_HostnameValue.location = New-Object System.Drawing.Point (90, 67)
-$LABEL_HostnameValue.Font = 'Microsoft Sans Serif,10'
 $LABEL_Version = New-Object system.Windows.Forms.Label
 $LABEL_Version.text = $ver
 $LABEL_Version.AutoSize = $true
 $LABEL_Version.width = 25
 $LABEL_Version.height = 10
-$LABEL_Version.location = New-Object System.Drawing.Point (10, 360)
+$LABEL_Version.location = New-Object System.Drawing.Point(10, 360)
 $LABEL_Version.Font = 'Microsoft Sans Serif,10'
 $GROUPBOX_Excluded = New-Object system.Windows.Forms.Groupbox
 $GROUPBOX_Excluded.height = 50
 $GROUPBOX_Excluded.width = 225
 $GROUPBOX_Excluded.text = "Excluded"
-$GROUPBOX_Excluded.location = New-Object System.Drawing.Point (10, 280)
+$GROUPBOX_Excluded.location = New-Object System.Drawing.Point(10, 280)
 $LISTBOX_MigrateInfo = New-Object system.Windows.Forms.ListBox
 $LISTBOX_MigrateInfo.text = "listBox"
 $LISTBOX_MigrateInfo.width = 245
-$LISTBOX_MigrateInfo.height = 150
-$LISTBOX_MigrateInfo.location = New-Object System.Drawing.Point (245, 180)
+$LISTBOX_MigrateInfo.height = 249
+$LISTBOX_MigrateInfo.location = New-Object System.Drawing.Point(245, 86)
 $TEXTBOX_Excluded = New-Object system.Windows.Forms.TextBox
 $TEXTBOX_Excluded.multiline = $false
 $TEXTBOX_Excluded.width = 205
 $TEXTBOX_Excluded.height = 20
-$TEXTBOX_Excluded.location = New-Object System.Drawing.Point (10, 20)
+$TEXTBOX_Excluded.location = New-Object System.Drawing.Point(10, 20)
 $TEXTBOX_Excluded.Font = 'Microsoft Sans Serif,10'
 $LABEL_ProfileFound = New-Object system.Windows.Forms.Label
+$LABEL_ProfileFound.text = ""
 $LABEL_ProfileFound.AutoSize = $true
 $LABEL_ProfileFound.width = 40
 $LABEL_ProfileFound.height = 10
-$LABEL_ProfileFound.location = New-Object System.Drawing.Point (120, 350)
+$LABEL_ProfileFound.location = New-Object System.Drawing.Point(120, 350)
 $LABEL_ProfileFound.Font = 'Microsoft Sans Serif,10,style=Bold'
-$FORM_PFMGMain.controls.AddRange(@($GROUPBOX_MigrationPath, $GROUPBOX_ProfileStats, $GROUPBOX_Folders, $GROUPBOX_Bookmarks, $BUTTON_Exit, $BUTTON_Migrate, $LABEL_Version, $GROUPBOX_Excluded, $LISTBOX_MigrateInfo, $LABEL_ProfileFound))
+$FORM_PFMGMain.controls.AddRange(@($GROUPBOX_MigrationPath, $GROUPBOX_Folders, $GROUPBOX_Bookmarks, $BUTTON_Exit, $BUTTON_Migrate, $LABEL_Version, $GROUPBOX_Excluded, $LISTBOX_MigrateInfo, $LABEL_ProfileFound))
 $GROUPBOX_MigrationPath.controls.AddRange(@($TEXTBOX_BackupPath, $BUTTON_PathSelection))
 $GROUPBOX_Folders.controls.AddRange(@($CHECKBOX_Desktop, $CHECKBOX_Documents, $CHECKBOX_Pictures, $CHECKBOX_Downloads))
 $GROUPBOX_Bookmarks.controls.AddRange(@($CHECKBOX_InternetExplorer, $CHECKBOX_Edge, $CHECKBOX_Firefox, $CHECKBOX_GoogleChrome))
-$GROUPBOX_ProfileStats.controls.AddRange(@($LABEL_Username, $LABEL_Domain, $LABEL_Hostname, $LABEL_UsernameValue, $LABEL_DomainValue, $LABEL_HostnameValue))
 $GROUPBOX_Excluded.controls.AddRange(@($TEXTBOX_Excluded))
 #
 $FORM_PFMGMain.Add_Shown( {
@@ -322,6 +279,18 @@ function UpdateUi () {
 	$pathToJson = "C:\ProgramData\PFMG-Data\PFMG.json"
 	$jsonSettings = Get-Content -Path $pathToJson -Raw | ConvertFrom-Json
 	$LISTBOX_MigrateInfo.Items.Clear()
+	$LISTBOX_MigrateInfo.Items.Add("System Information:")
+	$LISTBOX_MigrateInfo.Items.Add("-------------------------------")
+	$LISTBOX_MigrateInfo.Items.Add("Username: $($currentUser)")
+	if ($env:USERDNSDOMAIN) {
+		$LISTBOX_MigrateInfo.Items.Add("Domain: $($env:USERDNSDOMAIN)")	
+	}
+	$LISTBOX_MigrateInfo.Items.Add("Computer: $($env:COMPUTERNAME)")
+	$LISTBOX_MigrateInfo.Items.Add("Model: $($pcStats.Model)")
+	$LISTBOX_MigrateInfo.Items.Add("Manufacturer: $($pcStats.Manufacturer)")
+	$LISTBOX_MigrateInfo.Items.Add("")
+	$LISTBOX_MigrateInfo.Items.Add("User Profile Data:")
+	$LISTBOX_MigrateInfo.Items.Add("-------------------------------")
 	if ($CHECKBOX_Desktop.Checked) {
 		$LISTBOX_MigrateInfo.Items.Add("Desktop = $($jsonSettings.exportSizeDesktop) GB")
 		$exportSizeTotal += [double]$jsonSettings.exportSizeDesktop
@@ -342,9 +311,6 @@ function UpdateUi () {
 	$LISTBOX_MigrateInfo.Items.Add("")
 	$LISTBOX_MigrateInfo.Items.Add("Export Total = $($exportSizeTotal) GB")
 }
-
-
-
 $timer.start()
 $timerImport = New-Object System.Windows.Forms.Timer
 $timerImport.Interval = 2000
@@ -352,7 +318,22 @@ $timerImport.add_tick( { UpdateUitimerImport })
 function UpdateUitimerImport () {
 	$pathToJson = "C:\ProgramData\PFMG-Data\PFMG.json"	
 	$jsonSettings = Get-Content -Path $pathToJson -Raw | ConvertFrom-Json
+	$pathToJsonProfile = "$($TEXTBOX_BackupPath.text)\jsonProfile.json"
+	$jsonProfile = Get-Content -Path $pathToJsonProfile -Raw | ConvertFrom-Json
 	$LISTBOX_MigrateInfo.Items.Clear()
+	$LISTBOX_MigrateInfo.Items.Add("System Information:")
+	$LISTBOX_MigrateInfo.Items.Add("-------------------------------")
+	$LISTBOX_MigrateInfo.Items.Add("Username: $($jsonProfile.UsernameValue)")
+	if ($env:USERDNSDOMAIN) {
+		$LISTBOX_MigrateInfo.Items.Add("Domain: $($jsonProfile.DomainValue)")	
+	}
+	$LISTBOX_MigrateInfo.Items.Add("Computer: $($env:COMPUTERNAME)")
+	$LISTBOX_MigrateInfo.Items.Add("Model: $($pcStats.Model)")
+	$LISTBOX_MigrateInfo.Items.Add("Manufacturer: $($pcStats.Manufacturer)")
+	$LISTBOX_MigrateInfo.Items.Add("Export Timestamp: $($jsonProfile.dateTime)")
+	$LISTBOX_MigrateInfo.Items.Add("")
+	$LISTBOX_MigrateInfo.Items.Add("User Profile Data:")
+	$LISTBOX_MigrateInfo.Items.Add("-------------------------------")
 	$LISTBOX_MigrateInfo.Items.Add("Desktop = $($jsonSettings.importSizeDesktop) GB")
 	$importSizeTotal += [double]$jsonSettings.importSizeDesktop
 	$LISTBOX_MigrateInfo.Items.Add("Downloads = $($jsonSettings.importSizeDownloads) GB")
@@ -387,9 +368,6 @@ if (Test-Path -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Google
 else {
 	$CHECKBOX_GoogleChrome.Enabled = $False
 }
-$LABEL_UsernameValue.text = $currentUser
-$LABEL_DomainValue.text = $env:USERDNSDOMAIN
-$LABEL_HostnameValue.text = $env:COMPUTERNAME
 $TEXTBOX_Excluded.text = $jsonSettings.exclude
 $timerExclude = New-Object System.Windows.Forms.Timer
 $timerExclude.Interval = 1000
@@ -422,22 +400,12 @@ $TEXTBOX_BackupPath.Add_TextChanged( {
 			$CHECKBOX_Firefox.Enabled = $False
 			$CHECKBOX_GoogleChrome.Enabled = $False
 			$TEXTBOX_Excluded.Enabled = $False
-			$pathToJsonProfile = "$($TEXTBOX_BackupPath.text)\jsonProfile.json"
-			$jsonProfile = Get-Content -Path $pathToJsonProfile -Raw | ConvertFrom-Json
-			$pathToJson = "C:\ProgramData\PFMG-Data\PFMG.json"
-			$jsonSettings = Get-Content -Path $pathToJson -Raw | ConvertFrom-Json
-			$jsonSettings.path = $TEXTBOX_BackupPath.text
-			$jsonSettings | ConvertTo-Json | Set-Content $pathToJson
-			$LABEL_UsernameValue.ForeColor = 'Green'
-			$LABEL_UsernameValue.text = $jsonProfile.UsernameValue
-			$LABEL_DomainValue.ForeColor = 'Green'
-			$LABEL_DomainValue.text = $jsonProfile.DomainValue
-			$LABEL_HostnameValue.ForeColor = 'Green'
-			$LABEL_HostnameValue.text = $jsonProfile.HostnameValue
 		}
 		else {
 			$timerImport.stop()
 			$timer.start()
+			$LISTBOX_MigrateInfo.Items.Clear()
+			$LISTBOX_MigrateInfo.Items.Add("Loading...")
 			$BUTTON_Migrate.text = 'Export'
 			$LABEL_ProfileFound.text = ""
 			$CHECKBOX_Desktop.Enabled = $True
@@ -455,9 +423,6 @@ $TEXTBOX_BackupPath.Add_TextChanged( {
 				$CHECKBOX_GoogleChrome.Enabled = $True
 			}
 			$TEXTBOX_Excluded.Enabled = $True
-			$LABEL_UsernameValue.ForeColor = 'Black'
-			$LABEL_DomainValue.ForeColor = 'Black'
-			$LABEL_HostnameValue.ForeColor = 'Black'
 		}
 	})
 $TEXTBOX_Excluded.Add_TextChanged( {
@@ -530,6 +495,7 @@ $BUTTON_Migrate.Add_Click( {
 					Stop-Process -Name Firefox -Force -ErrorAction SilentlyContinue
 					Stop-Process -Name Chrome -Force -ErrorAction SilentlyContinue
 					$dateTime = Get-Date -UFormat '+%Y-%m-%d'
+					$dateTimeLong = Get-Date -UFormat '+%Y-%m-%d T%H-%M-%S'
 					$mFileName = "$($currentUser)_$($env:COMPUTERNAME)_$($dateTime)PFMG"
 					$toExclude = $TEXTBOX_Excluded.text.Split(" ")
 					Show-Console
@@ -569,6 +535,8 @@ $BUTTON_Migrate.Add_Click( {
   "UsernameValue": "*.pst",
   "DomainValue": null,
   "HostnameValue": null,
+  "ModelValue": null,
+  "ManufacturerValue": null,
   "dateTime": null
   }
 "@
@@ -578,7 +546,9 @@ $BUTTON_Migrate.Add_Click( {
 					$jsonProfile.UsernameValue = $currentUser
 					$jsonProfile.DomainValue = $env:USERDNSDOMAIN
 					$jsonProfile.HostnameValue = $env:COMPUTERNAME
-					$jsonProfile.dateTime = $dateTime
+					$jsonProfile.ModelValue = $pcStats.Model
+					$jsonProfile.ManufacturerValue = $pcStats.Manufacturer
+					$jsonProfile.dateTime = $dateTimeLong
 					$jsonProfile | ConvertTo-Json | Set-Content $pathToJsonProfile
 					$LABEL_ProfileFound.text = "Complete!"
 					$LABEL_ProfileFound.ForeColor = 'Green'
