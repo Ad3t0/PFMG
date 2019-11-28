@@ -488,7 +488,13 @@ $BUTTON_Migrate.Add_Click( {
 			}
 		}
 		else {
-			$importConfirm = [System.Windows.MessageBox]::Show('All open web browsers will be force closed before the export. Are you sure?', 'Profile Export', 'YesNo', 'Warning')
+			if ($exportSizeTotal -gt 5) {
+				$importConfirm = [System.Windows.MessageBox]::Show('This is a large profile at $($exportSizeTotal) GB. All open web browsers will be force closed before the export. Are you sure?', 'Profile Export', 'YesNo', 'Warning')
+			}
+			else {
+				$importConfirm = [System.Windows.MessageBox]::Show('All open web browsers will be force closed before the export. Are you sure?', 'Profile Export', 'YesNo', 'Warning')
+			}
+			
 			switch ($importConfirm) {
 				'Yes' {
 					Stop-Process -Name MicrosoftEdge -Force -ErrorAction SilentlyContinue
