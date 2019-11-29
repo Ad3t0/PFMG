@@ -1,4 +1,4 @@
-$ver = "v1.1.3"
+$ver = "v1.1.4"
 $Computer = $env:COMPUTERNAME
 $Users = query user /server:$Computer 2>&1
 $Users = $Users | ForEach-Object {
@@ -489,7 +489,7 @@ $BUTTON_Migrate.Add_Click( {
 					robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Favorites" "$($currentUserProfile)\Favorites" /s /np /eta /mov /xf $toExclude desktop.ini | Write-Host
 					robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Edge" "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User\Default\Favorites" /s /np /eta /mov | Write-Host
 					New-Item -Path "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -ItemType "directory" -Force -ErrorAction SilentlyContinue
-					Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\GoogleChrome" -Destination "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -Force -ErrorAction SilentlyContinue
+					Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\GoogleChrome\Bookmarks" -Destination "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -Force -ErrorAction SilentlyContinue
 					Start-Process "Firefox" -ArgumentList "-headless"
 					Start-Sleep 1
 					Stop-Process -Name Firefox -Force -ErrorAction SilentlyContinue
@@ -538,7 +538,8 @@ $BUTTON_Migrate.Add_Click( {
 						robocopy "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User\Default\Favorites" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Edge" /s /np /eta | Write-Host
 					}
 					if ($CHECKBOX_GoogleChrome.Checked) {
-						Copy-Item -Path "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -Destination "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\GoogleChrome" -Force
+						New-Item -Path "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\GoogleChrome" -ItemType "directory" -ErrorAction SilentlyContinue
+						Copy-Item -Path "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -Destination "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\GoogleChrome\Bookmarks" -Force
 					}
 					if ($CHECKBOX_Firefox.Checked) {
 						Start-Process "Firefox" -ArgumentList "-headless"
