@@ -494,7 +494,6 @@ $BUTTON_Migrate.Add_Click( {
 			else {
 				$importConfirm = [System.Windows.MessageBox]::Show('All open web browsers will be force closed before the export. Are you sure?', 'Profile Export', 'YesNo', 'Warning')
 			}
-			
 			switch ($importConfirm) {
 				'Yes' {
 					Stop-Process -Name MicrosoftEdge -Force -ErrorAction SilentlyContinue
@@ -569,6 +568,9 @@ $BUTTON_Exit.Add_Click( {
 		$window.Close()
 		Stop-Process $pid
 	})
+$windowcode = '[DllImport("user32.dll")] public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);'
+$asyncwindow = Add-Type -MemberDefinition $windowcode -Name Win32ShowWindowAsync -Namespace Win32Functions -PassThru
+$null = $asyncwindow::ShowWindowAsync((Get-Process -PID $pid).MainWindowHandle, 0)
 $FORM_PFMGMain.ShowDialog()
 [System.GC]::Collect()
 $appContext = New-Object System.Windows.Forms.ApplicationContext
