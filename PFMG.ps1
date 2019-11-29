@@ -1,4 +1,4 @@
-$ver = "v1.1.5"
+$ver = "v1.1.6"
 $Computer = $env:COMPUTERNAME
 $Users = query user /server:$Computer 2>&1
 $Users = $Users | ForEach-Object {
@@ -391,52 +391,54 @@ function textExcludeChanged () {
 	$timerExclude.stop()
 }
 $TEXTBOX_BackupPath.Add_TextChanged( {
-		if (Test-Path -Path $TEXTBOX_BackupPath.text) {
-			$BUTTON_Migrate.Enabled = $True
-		}
-		else {
-			$BUTTON_Migrate.Enabled = $False
-		}
-		if (Test-Path -Path "$($TEXTBOX_BackupPath.text)\jsonProfile.json") {
-			Invoke-ScriptMultithreaded -Script "C:\ProgramData\PFMG-Data\PFMG-importSize.ps1" -Array 1
-			$LISTBOX_MigrateInfo.Items.Clear()
-			$LISTBOX_MigrateInfo.Items.Add("Loading...")
-			$timer.stop()
-			$timerImport.start()
-			$BUTTON_Migrate.text = 'Import'
-			$LABEL_ProfileFound.text = "Profile Found"
-			$CHECKBOX_Desktop.Enabled = $False
-			$CHECKBOX_Downloads.Enabled = $False
-			$CHECKBOX_Documents.Enabled = $False
-			$CHECKBOX_Pictures.Enabled = $False
-			$CHECKBOX_InternetExplorer.Enabled = $False
-			$CHECKBOX_Edge.Enabled = $False
-			$CHECKBOX_Firefox.Enabled = $False
-			$CHECKBOX_GoogleChrome.Enabled = $False
-			$TEXTBOX_Excluded.Enabled = $False
-		}
-		else {
-			$timerImport.stop()
-			$timer.start()
-			$LISTBOX_MigrateInfo.Items.Clear()
-			$LISTBOX_MigrateInfo.Items.Add("Loading...")
-			$BUTTON_Migrate.text = 'Export'
-			$LABEL_ProfileFound.text = ""
-			$CHECKBOX_Desktop.Enabled = $True
-			$CHECKBOX_Downloads.Enabled = $True
-			$CHECKBOX_Documents.Enabled = $True
-			$CHECKBOX_Pictures.Enabled = $True
-			$CHECKBOX_InternetExplorer.Enabled = $True
-			if ($OS.Caption -like "*Windows 10*") {
-				$CHECKBOX_Edge.Enabled = $True
+		if (!([bool]([uri]$TEXTBOX_BackupPath.text).IsUnc -and $TEXTBOX_BackupPath.text -match '^\\\\\w+$')) {
+			if (Test-Path -Path $TEXTBOX_BackupPath.text) {
+				$BUTTON_Migrate.Enabled = $True
 			}
-			if (Test-Path -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Firefox.lnk") {
-				$CHECKBOX_Firefox.Enabled = $True
+			else {
+				$BUTTON_Migrate.Enabled = $False
 			}
-			if (Test-Path -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Google Chrome.lnk") {
-				$CHECKBOX_GoogleChrome.Enabled = $True
+			if (Test-Path -Path "$($TEXTBOX_BackupPath.text)\jsonProfile.json") {
+				Invoke-ScriptMultithreaded -Script "C:\ProgramData\PFMG-Data\PFMG-importSize.ps1" -Array 1
+				$LISTBOX_MigrateInfo.Items.Clear()
+				$LISTBOX_MigrateInfo.Items.Add("Loading...")
+				$timer.stop()
+				$timerImport.start()
+				$BUTTON_Migrate.text = 'Import'
+				$LABEL_ProfileFound.text = "Profile Found"
+				$CHECKBOX_Desktop.Enabled = $False
+				$CHECKBOX_Downloads.Enabled = $False
+				$CHECKBOX_Documents.Enabled = $False
+				$CHECKBOX_Pictures.Enabled = $False
+				$CHECKBOX_InternetExplorer.Enabled = $False
+				$CHECKBOX_Edge.Enabled = $False
+				$CHECKBOX_Firefox.Enabled = $False
+				$CHECKBOX_GoogleChrome.Enabled = $False
+				$TEXTBOX_Excluded.Enabled = $False
 			}
-			$TEXTBOX_Excluded.Enabled = $True
+			else {
+				$timerImport.stop()
+				$timer.start()
+				$LISTBOX_MigrateInfo.Items.Clear()
+				$LISTBOX_MigrateInfo.Items.Add("Loading...")
+				$BUTTON_Migrate.text = 'Export'
+				$LABEL_ProfileFound.text = ""
+				$CHECKBOX_Desktop.Enabled = $True
+				$CHECKBOX_Downloads.Enabled = $True
+				$CHECKBOX_Documents.Enabled = $True
+				$CHECKBOX_Pictures.Enabled = $True
+				$CHECKBOX_InternetExplorer.Enabled = $True
+				if ($OS.Caption -like "*Windows 10*") {
+					$CHECKBOX_Edge.Enabled = $True
+				}
+				if (Test-Path -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Firefox.lnk") {
+					$CHECKBOX_Firefox.Enabled = $True
+				}
+				if (Test-Path -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Google Chrome.lnk") {
+					$CHECKBOX_GoogleChrome.Enabled = $True
+				}
+				$TEXTBOX_Excluded.Enabled = $True
+			}
 		}
 	})
 $TEXTBOX_Excluded.Add_TextChanged( {
