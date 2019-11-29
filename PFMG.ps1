@@ -1,6 +1,14 @@
-$ver = "v1.1.1"
-$currentUser = Get-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI -Name "LastLoggedOnDisplayName"
-$currentUser = $currentUser.LastLoggedOnDisplayName
+$ver = "v1.1.2"
+$Computer = $env:COMPUTERNAME
+$Users = query user /server:$Computer 2>&1
+$Users = $Users | ForEach-Object {
+	(($_.trim() -replace ">" -replace "(?m)^([A-Za-z0-9]{3,})\s+(\d{1,2}\s+\w+)", '$1  none  $2' -replace "\s{2,}", "," -replace "none", $null))
+} | ConvertFrom-Csv
+foreach ($User in $Users) {
+	if ($User.STATE -eq "Active") {
+		$currentUser = $User.USERNAME
+	}
+}
 $currentUserProfile = "C:\Users\$($currentUser)"
 $pcStats = Get-CimInstance -ClassName Win32_ComputerSystem
 $OS = Get-CimInstance Win32_OperatingSystem
@@ -77,8 +85,16 @@ $jsonSettings = Get-Content -Path $pathToJson -Raw | ConvertFrom-Json
 $exportSize = @'
 $pathToJson = "C:\ProgramData\PFMG-Data\PFMG.json"
 $jsonSettings = Get-Content -Path $pathToJson -Raw | ConvertFrom-Json
-$currentUser = Get-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI -Name "LastLoggedOnDisplayName"
-$currentUser = $currentUser.LastLoggedOnDisplayName
+$Computer = $env:COMPUTERNAME
+$Users = query user /server:$Computer 2>&1
+$Users = $Users | ForEach-Object {
+	(($_.trim() -replace ">" -replace "(?m)^([A-Za-z0-9]{3,})\s+(\d{1,2}\s+\w+)", '$1  none  $2' -replace "\s{2,}", "," -replace "none", $null))
+} | ConvertFrom-Csv
+foreach ($User in $Users) {
+	if ($User.STATE -eq "Active") {
+		$currentUser = $User.USERNAME
+	}
+}
 $currentUserProfile = "C:\Users\$($currentUser)"
 $toExclude = $jsonSettings.exclude.Split(" ")
 $exportSizeDesktop = "{0:N2}" -f ((Get-ChildItem "$($currentUserProfile)\Desktop" -Recurse -Exclude $toExclude | Measure-Object -Property Length -Sum).Sum / 1GB)
