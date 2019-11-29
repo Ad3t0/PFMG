@@ -1,7 +1,6 @@
-$ver = "v1.1.0"
-$p = Get-Process -Name explorer
-$procId = $p.Id[0]
-$currentUser = (Get-WmiObject -Class Win32_Process -Filter "ProcessId=$($procId)").GetOwner().User
+$ver = "v1.1.1"
+$currentUser = Get-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI -Name "LastLoggedOnDisplayName"
+$currentUser = $currentUser.LastLoggedOnDisplayName
 $currentUserProfile = "C:\Users\$($currentUser)"
 $pcStats = Get-CimInstance -ClassName Win32_ComputerSystem
 $OS = Get-CimInstance Win32_OperatingSystem
@@ -78,9 +77,8 @@ $jsonSettings = Get-Content -Path $pathToJson -Raw | ConvertFrom-Json
 $exportSize = @'
 $pathToJson = "C:\ProgramData\PFMG-Data\PFMG.json"
 $jsonSettings = Get-Content -Path $pathToJson -Raw | ConvertFrom-Json
-$p = Get-Process -Name explorer
-$procId = $p.Id[0]
-$currentUser = (Get-WmiObject -Class Win32_Process -Filter "ProcessId=$($procId)").GetOwner().User
+$currentUser = Get-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI -Name "LastLoggedOnDisplayName"
+$currentUser = $currentUser.LastLoggedOnDisplayName
 $currentUserProfile = "C:\Users\$($currentUser)"
 $toExclude = $jsonSettings.exclude.Split(" ")
 $exportSizeDesktop = "{0:N2}" -f ((Get-ChildItem "$($currentUserProfile)\Desktop" -Recurse -Exclude $toExclude | Measure-Object -Property Length -Sum).Sum / 1GB)
