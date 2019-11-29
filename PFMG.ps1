@@ -1,4 +1,4 @@
-$ver = "v1.1.4"
+$ver = "v1.1.5"
 $Computer = $env:COMPUTERNAME
 $Users = query user /server:$Computer 2>&1
 $Users = $Users | ForEach-Object {
@@ -487,7 +487,7 @@ $BUTTON_Migrate.Add_Click( {
 					robocopy "$($TEXTBOX_BackupPath.text)\Documents" "$($currentUserProfile)\Documents" /s /np /eta /mov /xf $toExclude desktop.ini | Write-Host
 					robocopy "$($TEXTBOX_BackupPath.text)\Pictures" "$($currentUserProfile)\Pictures" /s /np /eta /mov /xf $toExclude desktop.ini | Write-Host
 					robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Favorites" "$($currentUserProfile)\Favorites" /s /np /eta /mov /xf $toExclude desktop.ini | Write-Host
-					robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Edge" "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User\Default\Favorites" /s /np /eta /mov | Write-Host
+					robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Edge" "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User\Default\DataStore" /s /it /is /np /eta /mov | Write-Host
 					New-Item -Path "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -ItemType "directory" -Force -ErrorAction SilentlyContinue
 					Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\GoogleChrome\Bookmarks" -Destination "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -Force -ErrorAction SilentlyContinue
 					Start-Process "Firefox" -ArgumentList "-headless"
@@ -535,7 +535,7 @@ $BUTTON_Migrate.Add_Click( {
 						robocopy "$($currentUserProfile)\Favorites" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Favorites" /s /np /eta /xf $toExclude desktop.ini Bing.lnk | Write-Host
 					}
 					if ($CHECKBOX_Edge.Checked) {
-						robocopy "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User\Default\Favorites" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Edge" /s /np /eta | Write-Host
+						robocopy "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User\Default\DataStore" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Edge" /s /np /eta | Write-Host
 					}
 					if ($CHECKBOX_GoogleChrome.Checked) {
 						New-Item -Path "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\GoogleChrome" -ItemType "directory" -ErrorAction SilentlyContinue
@@ -573,7 +573,6 @@ $BUTTON_Migrate.Add_Click( {
 					$LABEL_ProfileFound.text = "Complete!"
 					$LABEL_ProfileFound.ForeColor = 'Green'
 					$FORM_PFMGMain.Show()
-					Hide-Console
 				}
 			}
 		}
@@ -583,9 +582,6 @@ $BUTTON_Exit.Add_Click( {
 		$window.Close()
 		Stop-Process $pid
 	})
-$windowcode = '[DllImport("user32.dll")] public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);'
-$asyncwindow = Add-Type -MemberDefinition $windowcode -Name Win32ShowWindowAsync -Namespace Win32Functions -PassThru
-$null = $asyncwindow::ShowWindowAsync((Get-Process -PID $pid).MainWindowHandle, 0)
 $FORM_PFMGMain.ShowDialog()
 [System.GC]::Collect()
 $appContext = New-Object System.Windows.Forms.ApplicationContext
