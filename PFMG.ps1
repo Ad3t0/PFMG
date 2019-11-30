@@ -1,4 +1,4 @@
-$ver = "v1.1.7"
+$ver = "v1.1.8"
 $Computer = $env:COMPUTERNAME
 $Users = query user /server:$Computer 2>&1
 $Users = $Users | ForEach-Object {
@@ -491,7 +491,7 @@ $BUTTON_Migrate.Add_Click( {
 					robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Favorites" "$($currentUserProfile)\Favorites" /s /np /eta /mov /xf $toExclude desktop.ini | Write-Host
 					
 
-					Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\Edge\spartan.edb" -Destination "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User\Default\DataStore\Data\nouser1\120712-0049\DBStore\spartan.edb" -Force #-ErrorAction SilentlyContinue
+					Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\Edge\spartan.edb" -Destination "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User\Default\DataStore\Data\nouser1\120712-0049\DBStore\" -Force #-ErrorAction SilentlyContinue
 
 					
 
@@ -544,7 +544,7 @@ $BUTTON_Migrate.Add_Click( {
 					}
 					if ($CHECKBOX_Edge.Checked) {
 
-						Copy-Item -Path "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User\Default\DataStore\Data\nouser1\120712-0049\DBStore\spartan.edb" -Destination "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Edge\spartan.edb" -Force #-ErrorAction SilentlyContinue
+						Copy-Item -Path "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User\Default\DataStore\Data\nouser1\120712-0049\DBStore\spartan.edb" -Destination "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Edge\" -Force #-ErrorAction SilentlyContinue
 
 						
 					}
