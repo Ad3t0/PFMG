@@ -1,4 +1,4 @@
-$ver = "v1.1.8"
+$ver = "v1.1.9"
 $Computer = $env:COMPUTERNAME
 $Users = query user /server:$Computer 2>&1
 $Users = $Users | ForEach-Object {
@@ -489,13 +489,7 @@ $BUTTON_Migrate.Add_Click( {
 					robocopy "$($TEXTBOX_BackupPath.text)\Documents" "$($currentUserProfile)\Documents" /s /np /eta /mov /xf $toExclude desktop.ini | Write-Host
 					robocopy "$($TEXTBOX_BackupPath.text)\Pictures" "$($currentUserProfile)\Pictures" /s /np /eta /mov /xf $toExclude desktop.ini | Write-Host
 					robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Favorites" "$($currentUserProfile)\Favorites" /s /np /eta /mov /xf $toExclude desktop.ini | Write-Host
-					
-
-					Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\Edge\spartan.edb" -Destination "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User\Default\DataStore\Data\nouser1\120712-0049\DBStore\" -Force #-ErrorAction SilentlyContinue
-
-					
-
-
+					Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\Edge\spartan.edb" -Destination "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User\Default\DataStore\Data\nouser1\120712-0049\DBStore\spartan.edb" -Force #-ErrorAction SilentlyContinue
 					New-Item -Path "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -ItemType "directory" -Force -ErrorAction SilentlyContinue
 					Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\GoogleChrome\Bookmarks" -Destination "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -Force -ErrorAction SilentlyContinue
 					Start-Process "Firefox" -ArgumentList "-headless"
@@ -543,10 +537,8 @@ $BUTTON_Migrate.Add_Click( {
 						robocopy "$($currentUserProfile)\Favorites" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Favorites" /s /np /eta /xf $toExclude desktop.ini Bing.lnk | Write-Host
 					}
 					if ($CHECKBOX_Edge.Checked) {
-
-						Copy-Item -Path "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User\Default\DataStore\Data\nouser1\120712-0049\DBStore\spartan.edb" -Destination "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Edge\" -Force #-ErrorAction SilentlyContinue
-
-						
+						New-Item -Path "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Edge" -ItemType "directory" -ErrorAction SilentlyContinue
+						Copy-Item -Path "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User\Default\DataStore\Data\nouser1\120712-0049\DBStore\spartan.edb" -Destination "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Edge\spartan.edb" -Force #-ErrorAction SilentlyContinue
 					}
 					if ($CHECKBOX_GoogleChrome.Checked) {
 						New-Item -Path "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\GoogleChrome" -ItemType "directory" -ErrorAction SilentlyContinue
@@ -556,7 +548,7 @@ $BUTTON_Migrate.Add_Click( {
 						Start-Process "Firefox" -ArgumentList "-headless"
 						Start-Sleep 1
 						Stop-Process -Name Firefox -Force -ErrorAction SilentlyContinue
-						$firefoxProfile = Get-ChildItem -Path "$($currentUserProfile)\AppData\Roaming\Mozilla\Firefox\Profiles\" | Where-Object { $_.PSIsContainer } | Sort-Object LastWriteTime -Descending | Select-Object -First 1 -ErrorAction SilentlyContinue
+						$firefoxProfile = Get-ChildItem -Path "$($currentUserProfile)\AppData\Roaming\Mozilla\Firefox\Profiles\" -ErrorAction SilentlyContinue | Where-Object { $_.PSIsContainer } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 						New-Item -Path "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Firefox" -ItemType "directory" -ErrorAction SilentlyContinue
 						Copy-Item -Path "$($currentUserProfile)\AppData\Roaming\Mozilla\Firefox\Profiles\$($firefoxProfile.Name)\places.sqlite" -Destination "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Firefox\" -Force -ErrorAction SilentlyContinue
 					}
