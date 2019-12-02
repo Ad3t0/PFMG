@@ -559,6 +559,7 @@ $BUTTON_Migrate.Add_Click( {
 
 
 					if ($CHECKBOX_Outlook.Checked) {
+						New-Item -Path "$($TEXTBOX_BackupPath.text)\$($mFileName)\Outlook" -ItemType "directory" -ErrorAction SilentlyContinue
 						reg export "HKU\$($userSID)\Software\Microsoft\Office\16.0\Outlook\Profiles" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Outlook\Outlook.reg"
 					}
 
