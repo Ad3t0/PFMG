@@ -9,9 +9,10 @@ foreach ($User in $Users) {
 		$currentUser = $User.USERNAME
 	}
 }
+$userSID = (New-Object System.Security.Principal.NTAccount($currentUser)).Translate([System.Security.Principal.SecurityIdentifier]).value
 $currentUserProfile = "C:\Users\$($currentUser)"
 $pcStats = Get-CimInstance -ClassName Win32_ComputerSystem
-$OS = Get-CimInstance Win32_OperatingSystem
+
 Add-Type -Name Window -Namespace Console -MemberDefinition '
 [DllImport("Kernel32.dll")]
 public static extern IntPtr GetConsoleWindow();
@@ -142,7 +143,7 @@ $FORM_PFMGMain.MaximizeBox = $false
 $FORM_PFMGMain.MinimizeBox = $false
 #
 [System.Windows.Forms.Application]::EnableVisualStyles()
-$FORM_PFMGMain.ClientSize = '500,380'
+$FORM_PFMGMain.ClientSize = '500,420'
 $FORM_PFMGMain.text = "PFMG"
 $FORM_PFMGMain.TopMost = $false
 $GROUPBOX_MigrationPath = New-Object system.Windows.Forms.Groupbox
@@ -166,7 +167,7 @@ $GROUPBOX_Folders = New-Object system.Windows.Forms.Groupbox
 $GROUPBOX_Folders.height = 90
 $GROUPBOX_Folders.width = 225
 $GROUPBOX_Folders.text = "Folders"
-$GROUPBOX_Folders.location = New-Object System.Drawing.Point(10, 80)
+$GROUPBOX_Folders.location = New-Object System.Drawing.Point(10, 75)
 $CHECKBOX_Desktop = New-Object system.Windows.Forms.CheckBox
 $CHECKBOX_Desktop.text = "Desktop"
 $CHECKBOX_Desktop.AutoSize = $false
@@ -199,7 +200,7 @@ $GROUPBOX_Bookmarks = New-Object system.Windows.Forms.Groupbox
 $GROUPBOX_Bookmarks.height = 90
 $GROUPBOX_Bookmarks.width = 225
 $GROUPBOX_Bookmarks.text = "Bookmarks"
-$GROUPBOX_Bookmarks.location = New-Object System.Drawing.Point(10, 180)
+$GROUPBOX_Bookmarks.location = New-Object System.Drawing.Point(10, 175)
 $CHECKBOX_InternetExplorer = New-Object system.Windows.Forms.CheckBox
 $CHECKBOX_InternetExplorer.text = "Internet Explorer"
 $CHECKBOX_InternetExplorer.AutoSize = $false
@@ -207,13 +208,6 @@ $CHECKBOX_InternetExplorer.width = 125
 $CHECKBOX_InternetExplorer.height = 20
 $CHECKBOX_InternetExplorer.location = New-Object System.Drawing.Point(20, 20)
 $CHECKBOX_InternetExplorer.Font = 'Microsoft Sans Serif,10'
-$CHECKBOX_Edge = New-Object system.Windows.Forms.CheckBox
-$CHECKBOX_Edge.text = "Edge"
-$CHECKBOX_Edge.AutoSize = $false
-$CHECKBOX_Edge.width = 60
-$CHECKBOX_Edge.height = 20
-$CHECKBOX_Edge.location = New-Object System.Drawing.Point(150, 20)
-$CHECKBOX_Edge.Font = 'Microsoft Sans Serif,10'
 $CHECKBOX_Firefox = New-Object system.Windows.Forms.CheckBox
 $CHECKBOX_Firefox.text = "Firefox"
 $CHECKBOX_Firefox.AutoSize = $false
@@ -232,30 +226,30 @@ $BUTTON_Exit = New-Object system.Windows.Forms.Button
 $BUTTON_Exit.text = "Exit"
 $BUTTON_Exit.width = 90
 $BUTTON_Exit.height = 30
-$BUTTON_Exit.location = New-Object System.Drawing.Point(400, 340)
+$BUTTON_Exit.location = New-Object System.Drawing.Point(400, 380)
 $BUTTON_Exit.Font = 'Microsoft Sans Serif,10'
 $BUTTON_Migrate = New-Object system.Windows.Forms.Button
 $BUTTON_Migrate.text = "Migrate"
 $BUTTON_Migrate.width = 90
 $BUTTON_Migrate.height = 30
-$BUTTON_Migrate.location = New-Object System.Drawing.Point(285, 340)
+$BUTTON_Migrate.location = New-Object System.Drawing.Point(285, 380)
 $BUTTON_Migrate.Font = 'Microsoft Sans Serif,10'
 $LABEL_Version = New-Object system.Windows.Forms.Label
 $LABEL_Version.text = $ver
 $LABEL_Version.AutoSize = $true
 $LABEL_Version.width = 25
 $LABEL_Version.height = 10
-$LABEL_Version.location = New-Object System.Drawing.Point(10, 360)
+$LABEL_Version.location = New-Object System.Drawing.Point(9, 399)
 $LABEL_Version.Font = 'Microsoft Sans Serif,10'
 $GROUPBOX_Excluded = New-Object system.Windows.Forms.Groupbox
 $GROUPBOX_Excluded.height = 50
 $GROUPBOX_Excluded.width = 225
 $GROUPBOX_Excluded.text = "Excluded"
-$GROUPBOX_Excluded.location = New-Object System.Drawing.Point(10, 280)
+$GROUPBOX_Excluded.location = New-Object System.Drawing.Point(10, 335)
 $LISTBOX_MigrateInfo = New-Object system.Windows.Forms.ListBox
 $LISTBOX_MigrateInfo.text = "listBox"
 $LISTBOX_MigrateInfo.width = 245
-$LISTBOX_MigrateInfo.height = 249
+$LISTBOX_MigrateInfo.height = 289
 $LISTBOX_MigrateInfo.location = New-Object System.Drawing.Point(245, 86)
 $TEXTBOX_Excluded = New-Object system.Windows.Forms.TextBox
 $TEXTBOX_Excluded.multiline = $false
@@ -264,17 +258,30 @@ $TEXTBOX_Excluded.height = 20
 $TEXTBOX_Excluded.location = New-Object System.Drawing.Point(10, 20)
 $TEXTBOX_Excluded.Font = 'Microsoft Sans Serif,10'
 $LABEL_ProfileFound = New-Object system.Windows.Forms.Label
-$LABEL_ProfileFound.text = ""
+$LABEL_ProfileFound.text = "Profile Found"
 $LABEL_ProfileFound.AutoSize = $true
 $LABEL_ProfileFound.width = 40
 $LABEL_ProfileFound.height = 10
-$LABEL_ProfileFound.location = New-Object System.Drawing.Point(120, 350)
+$LABEL_ProfileFound.location = New-Object System.Drawing.Point(120, 395)
 $LABEL_ProfileFound.Font = 'Microsoft Sans Serif,10,style=Bold'
-$FORM_PFMGMain.controls.AddRange(@($GROUPBOX_MigrationPath, $GROUPBOX_Folders, $GROUPBOX_Bookmarks, $BUTTON_Exit, $BUTTON_Migrate, $LABEL_Version, $GROUPBOX_Excluded, $LISTBOX_MigrateInfo, $LABEL_ProfileFound))
+$GROUPBOX_Outlook = New-Object system.Windows.Forms.Groupbox
+$GROUPBOX_Outlook.height = 50
+$GROUPBOX_Outlook.width = 225
+$GROUPBOX_Outlook.text = "Outlook"
+$GROUPBOX_Outlook.location = New-Object System.Drawing.Point(10, 275)
+$CHECKBOX_Outlook = New-Object system.Windows.Forms.CheckBox
+$CHECKBOX_Outlook.text = "Outlook Configuration"
+$CHECKBOX_Outlook.AutoSize = $false
+$CHECKBOX_Outlook.width = 164
+$CHECKBOX_Outlook.height = 20
+$CHECKBOX_Outlook.location = New-Object System.Drawing.Point(25, 20)
+$CHECKBOX_Outlook.Font = 'Microsoft Sans Serif,10'
+$FORM_PFMGMain.controls.AddRange(@($GROUPBOX_MigrationPath, $GROUPBOX_Folders, $GROUPBOX_Bookmarks, $BUTTON_Exit, $BUTTON_Migrate, $LABEL_Version, $GROUPBOX_Excluded, $LISTBOX_MigrateInfo, $LABEL_ProfileFound, $GROUPBOX_Outlook))
 $GROUPBOX_MigrationPath.controls.AddRange(@($TEXTBOX_BackupPath, $BUTTON_PathSelection))
 $GROUPBOX_Folders.controls.AddRange(@($CHECKBOX_Desktop, $CHECKBOX_Documents, $CHECKBOX_Pictures, $CHECKBOX_Downloads))
-$GROUPBOX_Bookmarks.controls.AddRange(@($CHECKBOX_InternetExplorer, $CHECKBOX_Edge, $CHECKBOX_Firefox, $CHECKBOX_GoogleChrome))
+$GROUPBOX_Bookmarks.controls.AddRange(@($CHECKBOX_InternetExplorer, $CHECKBOX_Firefox, $CHECKBOX_GoogleChrome))
 $GROUPBOX_Excluded.controls.AddRange(@($TEXTBOX_Excluded))
+$GROUPBOX_Outlook.controls.AddRange(@($CHECKBOX_Outlook))
 #
 $FORM_PFMGMain.Add_Shown( {
 		$FORM_PFMGMain.Activate()
@@ -364,12 +371,15 @@ $CHECKBOX_Desktop.Checked = $True
 $CHECKBOX_Documents.Checked = $True
 $CHECKBOX_Pictures.Checked = $True
 $CHECKBOX_InternetExplorer.Checked = $True
-if ($OS.Caption -like "*Windows 10*") {
-	$CHECKBOX_Edge.Checked = $True
+if (Test-Path -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Outlook*") {
+	$CHECKBOX_Outlook.Checked = $True
 }
 else {
-	$CHECKBOX_Edge.Enabled = $False
+	$CHECKBOX_Outlook.Enabled = $False
 }
+
+
+
 if (Test-Path -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Firefox.lnk") {
 	$CHECKBOX_Firefox.Checked = $True
 }
@@ -411,7 +421,14 @@ $TEXTBOX_BackupPath.Add_TextChanged( {
 				$CHECKBOX_Documents.Enabled = $False
 				$CHECKBOX_Pictures.Enabled = $False
 				$CHECKBOX_InternetExplorer.Enabled = $False
-				$CHECKBOX_Edge.Enabled = $False
+
+
+		
+					
+				
+				
+				$CHECKBOX_Outlook.Enabled = $False
+		
 				$CHECKBOX_Firefox.Enabled = $False
 				$CHECKBOX_GoogleChrome.Enabled = $False
 				$TEXTBOX_Excluded.Enabled = $False
@@ -428,9 +445,10 @@ $TEXTBOX_BackupPath.Add_TextChanged( {
 				$CHECKBOX_Documents.Enabled = $True
 				$CHECKBOX_Pictures.Enabled = $True
 				$CHECKBOX_InternetExplorer.Enabled = $True
-				if ($OS.Caption -like "*Windows 10*") {
-					$CHECKBOX_Edge.Enabled = $True
+				if (Test-Path -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Outlook*") {
+					$CHECKBOX_Outlook.Enabled = $True
 				}
+
 				if (Test-Path -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Firefox.lnk") {
 					$CHECKBOX_Firefox.Enabled = $True
 				}
@@ -477,7 +495,7 @@ $BUTTON_Migrate.Add_Click( {
 			$importConfirm = [System.Windows.MessageBox]::Show('All open web browsers will be force closed before the import. Are you sure?', 'Profile Import', 'YesNo', 'Warning')
 			switch ($importConfirm) {
 				'Yes' {
-					Stop-Process -Name MicrosoftEdge -Force -ErrorAction SilentlyContinue
+			
 					Stop-Process -Name Firefox -Force -ErrorAction SilentlyContinue
 					Stop-Process -Name Chrome -Force -ErrorAction SilentlyContinue
 					$pathToJsonProfile = "$($TEXTBOX_BackupPath.text)\jsonProfile.json"
@@ -489,7 +507,7 @@ $BUTTON_Migrate.Add_Click( {
 					robocopy "$($TEXTBOX_BackupPath.text)\Documents" "$($currentUserProfile)\Documents" /s /np /eta /mov /xf $toExclude desktop.ini | Write-Host
 					robocopy "$($TEXTBOX_BackupPath.text)\Pictures" "$($currentUserProfile)\Pictures" /s /np /eta /mov /xf $toExclude desktop.ini | Write-Host
 					robocopy "$($TEXTBOX_BackupPath.text)\Bookmarks\Favorites" "$($currentUserProfile)\Favorites" /s /np /eta /mov /xf $toExclude desktop.ini | Write-Host
-					Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\Edge\spartan.edb" -Destination "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User\Default\DataStore\Data\nouser1\120712-0049\DBStore\spartan.edb" -Force #-ErrorAction SilentlyContinue
+					REGEDIT /S "$($TEXTBOX_BackupPath.text)\Outlook\Outlook.reg"
 					New-Item -Path "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -ItemType "directory" -Force -ErrorAction SilentlyContinue
 					Copy-Item -Path "$($TEXTBOX_BackupPath.text)\Bookmarks\GoogleChrome\Bookmarks" -Destination "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -Force -ErrorAction SilentlyContinue
 					Start-Process "Firefox" -ArgumentList "-headless"
@@ -512,7 +530,7 @@ $BUTTON_Migrate.Add_Click( {
 			}
 			switch ($importConfirm) {
 				'Yes' {
-					Stop-Process -Name MicrosoftEdge -Force -ErrorAction SilentlyContinue
+					
 					Stop-Process -Name Firefox -Force -ErrorAction SilentlyContinue
 					Stop-Process -Name Chrome -Force -ErrorAction SilentlyContinue
 					$dateTime = Get-Date -UFormat '+%Y-%m-%d'
@@ -536,10 +554,18 @@ $BUTTON_Migrate.Add_Click( {
 					if ($CHECKBOX_InternetExplorer.Checked) {
 						robocopy "$($currentUserProfile)\Favorites" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Favorites" /s /np /eta /xf $toExclude desktop.ini Bing.lnk | Write-Host
 					}
-					if ($CHECKBOX_Edge.Checked) {
-						New-Item -Path "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Edge" -ItemType "directory" -ErrorAction SilentlyContinue
-						Copy-Item -Path "$($currentUserProfile)\AppData\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\MicrosoftEdge\User\Default\DataStore\Data\nouser1\120712-0049\DBStore\spartan.edb" -Destination "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\Edge\spartan.edb" -Force #-ErrorAction SilentlyContinue
+
+
+
+
+					if ($CHECKBOX_Outlook.Checked) {
+						reg export "HKU\$($userSID)\Software\Microsoft\Office\16.0\Outlook\Profiles" "$($TEXTBOX_BackupPath.text)\$($mFileName)\Outlook\Outlook.reg"
 					}
+
+
+
+
+
 					if ($CHECKBOX_GoogleChrome.Checked) {
 						New-Item -Path "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\GoogleChrome" -ItemType "directory" -ErrorAction SilentlyContinue
 						Copy-Item -Path "$($currentUserProfile)\AppData\Local\Google\Chrome\User Data\Default\Bookmarks" -Destination "$($TEXTBOX_BackupPath.text)\$($mFileName)\Bookmarks\GoogleChrome\Bookmarks" -Force -ErrorAction SilentlyContinue
