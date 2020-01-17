@@ -1,4 +1,4 @@
-$ver = "v1.2.0"
+$ver = "v1.2.1"
 $Computer = $env:COMPUTERNAME
 $Users = query user /server:$Computer 2>&1
 $Users = $Users | ForEach-Object {
@@ -142,7 +142,7 @@ $FORM_PFMGMain.MinimizeBox = $false
 #
 [System.Windows.Forms.Application]::EnableVisualStyles()
 $FORM_PFMGMain.ClientSize = '500,380'
-$FORM_PFMGMain.text = "PFMG"
+$FORM_PFMGMain.text = "PFMG $($ver)"
 $FORM_PFMGMain.TopMost = $false
 $GROUPBOX_MigrationPath = New-Object system.Windows.Forms.Groupbox
 $GROUPBOX_MigrationPath.height = 55
@@ -256,7 +256,7 @@ $TEXTBOX_Excluded.height = 20
 $TEXTBOX_Excluded.location = New-Object System.Drawing.Point(10, 20)
 $TEXTBOX_Excluded.Font = 'Microsoft Sans Serif,10'
 $LABEL_ProfileFound = New-Object system.Windows.Forms.Label
-$LABEL_ProfileFound.text = "Profile Found"
+$LABEL_ProfileFound.text = ""
 $LABEL_ProfileFound.AutoSize = $true
 $LABEL_ProfileFound.width = 40
 $LABEL_ProfileFound.height = 10
